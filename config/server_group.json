@@ -1,0 +1,16 @@
+{
+	"name": "test",
+	"domain_name": "vpc",
+	"description": "test description",
+	"servers": {
+		"login": {
+			"image_id": "51",
+			"flavor_id": "4",
+			"openvpn_server": "true"
+		},
+		"client1": {
+			"image_id": "51",
+			"flavor_id": "4"
+		}
+	}
+}

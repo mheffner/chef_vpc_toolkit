@@ -1,0 +1,73 @@
+= Chef VPC Toolkit
+
+Chef Virtual Private Cloud Toolkit
+
+== Description
+
+The Chef VPC Toolkit is a set of Rake tasks that provide a framework to help automate the creation and configuration of “identical” VPC server groups in the cloud. The Chef VPC Toolkit provides the ability to create “toolkit projects” that can be used by team members and continuous integration systems to spin up groups of servers for development and testing. Configuration information is stored in JSON and YAML formats which can be easily parsed, edited, and version controlled.
+
+== Features
+
+-Supports Centos, Fedora, RHEL, and Ubuntu.
+
+-Uses Cloud Servers VPC to create secure groups of servers in the public cloud.
+
+-Creates a local Chef Server within the server group.
+
+-Installs a Chef client on each node.
+
+-Automatically configures Chef Cookbooks, Databags, Roles, and Node attributes.
+
+== Installation
+
+Requires Ruby and Rubygems. The app was developed with Ruby 1.8.7.
+
+The following gems are required:
+
+	rake
+	builder (2.1.2)
+	json (> 1.4.3)
+
+To build the gem:
+
+	rake build
+	gem install pkg/chef-vpc-toolkit-1.5.0.gem
+
+== Examples
+
+Example commands:
+
+	- Create a new cloud server group, upload cookbooks, install chef
+	on all the nodes, sync share data and cookbooks.
+
+		$ rake create
+
+	- List your currently running cloud server groups.
+
+		$ rake cloud:list
+
+	- SSH into the current (most recently created) cloud server group
+
+		$ rake ssh
+
+	- SSH into a cloud server group with an ID of 3
+
+		$ rake ssh GROUP_ID=3
+
+	- Delete the cloud server group with an ID of 3
+
+		$ rake cloud:delete GROUP_ID=3
+
+	- Rebuild/Re-Chef a server in the most recently created cloud
+	server group
+
+		$ rake rechef SERVER_NAME=db1
+
+== Author
+
+Dan Prince <dan.prince@rackspace.com>
+
+== License
+
+See COPYING for license information.
+Copyright (c) 2010, Rackspace US, Inc.

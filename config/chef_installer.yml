@@ -1,0 +1,18 @@
+# Default options for the Chef Installer.
+
+# Shared Chef cookbook repositories are hosted in Cloud Files.
+#chef_cookbook_repos: CookbookRepos/cloud-toolkit-master.tar.gz
+
+# Optionally you can specify multiple repos:
+#chef_cookbook_repos:
+#- CookbookRepos/cloud-toolkit-1.2.tar.gz
+#- CookbookRepos/cookbook_repo1-1.1.tar.gz
+#- CookbookRepos/cookbook_repo2-trunk.tar.gz
+
+# The Chef JSON configuration contains attributes and recipes for nodes.
+chef_json_file: config/nodes.json
+
+#databags_json_file: config/databags.json
+
+# Chef server name
+chef_server_name: login

@@ -1,0 +1,79 @@
+#!/usr/bin/ruby
+
+require 'optparse'
+require 'rubygems'
+require 'fileutils'
+
+CHEF_VPC_PROJECT = "#{File.dirname(__FILE__)}" unless defined?(CHEF_VPC_PROJECT)
+require 'chef-vpc-toolkit'
+include ChefVPCToolkit
+
+
+options = {}
+opts = OptionParser.new
+
+options[:name] = ""
+opts.on("-n name", "--name", String,
+	"Create a new cloud project with the given directory name.") do |name|
+	options[:name] = name
+end
+
+options[:upgrade] = false
+opts.on("-u", "--upgrade", "Upgrade a cloud project to work with the latest Cloud Toolkit.") do
+	options[:upgrade] = true
+end
+
+opts.on_tail("-v", "--version", "Print version") do
+puts "Cloud Toolkit Version: #{Version::VERSION}"
+exit
+end
+
+opts.on_tail("-h", "--help", "Show help") do
+puts opts
+exit
+end
+
+opts.parse!(ARGV)
+
+# simple validations
+def exit_if_nil_or_empty(options, sym)
+	if options[sym].nil? || options[sym].empty? then
+		puts "Please specify a valid #{sym.to_s} parameter."
+		puts "Run with --help for more information."
+		exit 1
+	end
+end
+
+if options[:upgrade]
+
+	# Rakefile
+	if not File.exists?("Rakefile") then
+		puts "Unable to find Rakefile. Run the 'cloud-toolkit -u' commmand from within a cloud project directory."
+		exit 1
+	else
+		FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/contrib/Rakefile", "Rakefile")
+	end
+
+	# chef_installer.yml
+	if File.exists?("config/chef_installer.conf") then
+		FileUtils.mv("config/chef_installer.conf", "config/chef_installer.yml")
+	end
+
+else
+	exit_if_nil_or_empty(options, :name)
+
+	if File.exists?(options[:name]) then
+		puts "'#{options[:name]}' already exists."
+		exit 1
+	end
+
+	["", "share", "jobs"].each do |dir|
+		FileUtils.mkdir_p options[:name] + File::SEPARATOR + dir
+	end
+
+	["config", "cookbook-repos"].each do |dir|
+		FileUtils.cp_r(Version::CHEF_VPC_TOOLKIT_ROOT+File::SEPARATOR+dir, options[:name] + "/#{dir}")
+	end
+
+	FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/contrib/rake/Rakefile", options[:name] + "/Rakefile")
+end

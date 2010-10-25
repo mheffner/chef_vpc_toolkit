@@ -1,0 +1,6 @@
+require 'chef-vpc-toolkit/util'
+require 'chef-vpc-toolkit/chef_installer'
+require 'chef-vpc-toolkit/cloud_servers_vpc'
+require 'chef-vpc-toolkit/http_util'
+require 'chef-vpc-toolkit/ssh_util'
+require 'chef-vpc-toolkit/version'

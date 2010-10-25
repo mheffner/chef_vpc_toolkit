@@ -1,0 +1,10 @@
+{
+	"login": {
+		"run_list": [
+		]
+	},
+	"client1": {
+		"run_list": [
+		]
+	}
+}

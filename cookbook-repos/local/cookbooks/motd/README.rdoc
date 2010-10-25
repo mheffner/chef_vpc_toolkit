@@ -1,0 +1,15 @@
+= DESCRIPTION:
+Recipe to install a custom motd file.
+
+= REQUIREMENTS:
+None.
+
+= ATTRIBUTES: 
+
+motd - The message of the day.
+
+= USAGE:
+
+Example attributes in JSON:
+
+    "motd": "It works!"

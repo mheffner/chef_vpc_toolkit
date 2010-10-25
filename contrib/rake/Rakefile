@@ -1,0 +1,13 @@
+CHEF_VPC_PROJECT = "#{File.dirname(__FILE__)}" unless defined?(CHEF_VPC_PROJECT)
+
+require 'rubygems'
+
+#gem 'chef-cloud-toolkit', '= 2.0.0'
+
+require 'chef-vpc-toolkit'
+
+include ChefVPCToolkit
+
+Dir[File.join("#{ChefVPCToolkit::Version::CHEF_VPC_TOOLKIT_ROOT}/rake", '*.rake')].each do  |rakefile|
+    import(rakefile)
+end
