@@ -2,7 +2,17 @@ CHEF_VPC_PROJECT = "#{File.dirname(__FILE__)}" unless defined?(CHEF_VPC_PROJECT)
 
 require 'rubygems'
 
-#gem 'chef-cloud-toolkit', '= 2.0.0'
+version_file=(File.join(CHEF_VPC_PROJECT, 'config', 'TOOLKIT_VERSION'))
+toolkit_version=nil
+if ENV['CHEF_VPC_TOOLKIT_VERSION'] then
+	toolkit_version=ENV['CHEF_VPC_TOOLKIT_VERSION']
+elsif File.exists?(version_file)
+	toolkit_version=IO.read(version_file)
+end
+
+puts "Chef VPC Toolkit Version: #{toolkit_version}"
+
+gem 'chef-vpc-toolkit', "= #{toolkit_version}" if toolkit_version
 
 require 'chef-vpc-toolkit'
 

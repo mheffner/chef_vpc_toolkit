@@ -25,6 +25,9 @@ begin
 	gemspec.email = "dan.prince@rackspace.com"
 	gemspec.homepage = "http://github.com/rackspace/chef-vpc-toolkit"
 	gemspec.authors = ["Dan Prince"]
+    gemspec.add_dependency 'rake'
+    gemspec.add_dependency 'builder'
+    gemspec.add_dependency 'json'
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install jeweler"

@@ -8,7 +8,6 @@ CHEF_VPC_PROJECT = "#{File.dirname(__FILE__)}" unless defined?(CHEF_VPC_PROJECT)
 require 'chef-vpc-toolkit'
 include ChefVPCToolkit
 
-
 options = {}
 opts = OptionParser.new
 
@@ -67,13 +66,15 @@ else
 		exit 1
 	end
 
-	["", "share", "jobs"].each do |dir|
+	["", "share"].each do |dir|
 		FileUtils.mkdir_p options[:name] + File::SEPARATOR + dir
 	end
 
 	["config", "cookbook-repos"].each do |dir|
-		FileUtils.cp_r(Version::CHEF_VPC_TOOLKIT_ROOT+File::SEPARATOR+dir, options[:name] + "/#{dir}")
+		FileUtils.cp_r(Version::CHEF_VPC_TOOLKIT_ROOT+File::SEPARATOR+dir, File.join(options[:name], dir))
 	end
 
-	FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/contrib/rake/Rakefile", options[:name] + "/Rakefile")
+	FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/VERSION", File.join(options[:name], "config", "TOOLKIT_VERSION"))
+
+	FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/contrib/rake/Rakefile", File.join(options[:name], "Rakefile"))
 end
