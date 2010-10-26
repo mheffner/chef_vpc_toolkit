@@ -21,7 +21,7 @@ begin
   Jeweler::Tasks.new do |gemspec|
 	gemspec.name = "chef-vpc-toolkit"
 	gemspec.summary = "Rake tasks to automate and configure server groups in the cloud with Chef."
-	gemspec.description = "The Chef VPC Toolkit is a set of Rake tasks that provide a framework to help automate the creation and configuration of cloud server groups for development or testing. Requires Cloud Servers VPC."
+	gemspec.description = "The Chef VPC Toolkit is a set of Rake tasks that provide a framework to help automate the creation and configuration of VPC server groups in the cloud."
 	gemspec.email = "dan.prince@rackspace.com"
 	gemspec.homepage = "http://github.com/rackspace/chef-vpc-toolkit"
 	gemspec.authors = ["Dan Prince"]
