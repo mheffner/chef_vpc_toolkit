@@ -1,11 +1,13 @@
-# Default options for the Chef Installer.
+# Options for the Chef Installer.
 
-# Shared Chef cookbook repositories are hosted in Cloud Files.
-#chef_cookbook_repos: CookbookRepos/cloud-toolkit-master.tar.gz
+# Public cookbook repo. (Full URL)
+#chef_cookbook_repos: http://localhost/cookbook-repo1.tar.gz
+
+# Shared Chef cookbook repository hosted in Rackspace Cloud Files.
+#chef_cookbook_repos: CookbookRepos/cookbook-repo1.tar.gz
 
 # Optionally you can specify multiple repos:
 #chef_cookbook_repos:
-#- CookbookRepos/cloud-toolkit-1.2.tar.gz
 #- CookbookRepos/cookbook_repo1-1.1.tar.gz
 #- CookbookRepos/cookbook_repo2-trunk.tar.gz
 
