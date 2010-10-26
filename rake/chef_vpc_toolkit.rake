@@ -101,7 +101,7 @@ namespace :group do
 				CloudServersVPC.print_server_group(server_group_hash)
 			end
 		end
-		Rake::Task['cloud:show'].invoke
+		Rake::Task['group:show'].invoke
 		puts "Cloud server group online."
 	end
 
@@ -255,7 +255,7 @@ task :usage do
 	puts ""
 	puts "\t- List your currently running cloud server groups."
 	puts ""
-	puts "\t\t$ rake cloud:list"
+	puts "\t\t$ rake group:list"
 
 	puts ""
 	puts "\t- SSH into the current (most recently created) cloud server group"
@@ -270,7 +270,7 @@ task :usage do
 	puts ""
 	puts "\t- Delete the cloud server group with an ID of 3"
 	puts ""
-	puts "\t\t$ rake cloud:delete GROUP_ID=3"
+	puts "\t\t$ rake group:delete GROUP_ID=3"
 
 	puts ""
 	puts "\t- Rebuild/Re-Chef a server in the most recently created cloud\n\tserver group"
