@@ -1,2 +1,9 @@
 tmp
+
+## VIM
+*.swp
+
+## PROJECT::GENERAL
+coverage
+rdoc
 pkg
