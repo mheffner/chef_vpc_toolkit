@@ -1,0 +1,8 @@
+* Thu Dec 7 2010 Dan Prince <dan.prince@rackspace.com> - 2.0.1
+  - Automatically load rake files from the tasks directory.
+  - Rename config file from cloud_toolkit.conf to chef_vpc_toolkit.conf.
+  - Rename variable that can be used to override default config file location
+    to be called CHEF_VPC_TOOLKIT_CONF.
+
+* Thu Oct 26 2010 Dan Prince <dan.prince@rackspace.com> - 2.0.0
+  - Initial open source release.
