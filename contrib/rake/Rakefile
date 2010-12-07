@@ -21,3 +21,8 @@ include ChefVPCToolkit
 Dir[File.join("#{ChefVPCToolkit::Version::CHEF_VPC_TOOLKIT_ROOT}/rake", '*.rake')].each do  |rakefile|
     import(rakefile)
 end
+
+Dir[File.join(File.dirname("__FILE__"), 'tasks', '*.rake')].each do  |rakefile|
+puts rakefile
+    import(rakefile)
+end
