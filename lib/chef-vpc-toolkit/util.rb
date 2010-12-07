@@ -6,12 +6,12 @@ module Util
 
 	def self.load_configs
 
-		config_file=ENV['CLOUD_TEST_CONFIG_FILE']
+		config_file=ENV['CHEF_VPC_TOOLKIT_CONF']
 		if config_file.nil? then
 
-			config_file=ENV['HOME']+File::SEPARATOR+".cloud_toolkit.conf"
+			config_file=ENV['HOME']+File::SEPARATOR+".chef_vpc_toolkit.conf"
 			if not File.exists?(config_file) then
-				config_file="/etc/cloud_toolkit.conf"
+				config_file="/etc/chef_vpc_toolkit.conf"
 			end
 
 		end
@@ -23,7 +23,7 @@ module Util
 			raise_if_nil_or_empty(configs, "cloud_servers_vpc_password")
 			return configs
 		else
-			raise "Failed to load cloud toolkit config file. Please configure /etc/cloud_toolkit.conf or create a .cloud_toolkit.conf config file in your HOME directory."
+			raise "Failed to load cloud toolkit config file. Please configure /etc/chef_vpc_toolkit.conf or create a .chef_vpc_toolkit.conf config file in your HOME directory."
 		end
 
 	end
