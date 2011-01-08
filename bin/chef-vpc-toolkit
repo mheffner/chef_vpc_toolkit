@@ -13,17 +13,17 @@ opts = OptionParser.new
 
 options[:name] = ""
 opts.on("-n name", "--name", String,
-	"Create a new cloud project with the given directory name.") do |name|
+	"Create a new project with the given directory name.") do |name|
 	options[:name] = name
 end
 
 options[:upgrade] = false
-opts.on("-u", "--upgrade", "Upgrade a cloud project to work with the latest Cloud Toolkit.") do
+opts.on("-u", "--upgrade", "Upgrade a project to work with the latest Chef VPC Toolkit.") do
 	options[:upgrade] = true
 end
 
 opts.on_tail("-v", "--version", "Print version") do
-puts "Cloud Toolkit Version: #{Version::VERSION}"
+puts "Chef VPC Toolkit Version: #{Version::VERSION}"
 exit
 end
 
@@ -47,10 +47,10 @@ if options[:upgrade]
 
 	# Rakefile
 	if not File.exists?("Rakefile") then
-		puts "Unable to find Rakefile. Run the 'cloud-toolkit -u' commmand from within a cloud project directory."
+		puts "Unable to find Rakefile. Run the 'chef-vpc-toolkit -u' commmand from within a project directory."
 		exit 1
 	else
-		FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/contrib/Rakefile", "Rakefile")
+		FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/contrib/rake/Rakefile", "Rakefile")
 	end
 
 	# chef_installer.yml
