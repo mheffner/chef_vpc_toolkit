@@ -229,6 +229,8 @@ module CloudServersVPC
 					"centos"
 				when 187811 # Centos 5.4
 					"centos"
+				when 71 # Fedora 14
+					"fedora"
 				when 53 # Fedora 13
 					"fedora"
 				when 17 # Fedora 12
