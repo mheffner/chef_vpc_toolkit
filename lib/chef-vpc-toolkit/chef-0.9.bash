@@ -166,7 +166,7 @@ local REPOS_BASEDIR=${2:-"/root/cookbook-repos"}
 for CB_REPO in $COOKBOOK_URLS; do
 echo -n "Downloading $CB_REPO..."
 	if [ "http:" == ${CB_REPO:0:5} ] || [ "https:" == ${CB_REPO:0:6} ]; then
-		wget "$CB_REPO" -O "/tmp/cookbook-repo.tar.gz" &> /dev/null || { echo "Failed to download cookbook tarball."; return 1; }
+		wget --no-check-certificate "$CB_REPO" -O "/tmp/cookbook-repo.tar.gz" &> /dev/null || { echo "Failed to download cookbook tarball."; return 1; }
 	else
 		download_cloud_file "$CB_REPO" "/tmp/cookbook-repo.tar.gz"
 	fi
