@@ -2,8 +2,10 @@
 
 namespace :group do
 	TMP_SG=File.join(CHEF_VPC_PROJECT, 'tmp', 'server_groups')
+	TMP_CLIENTS=File.join(CHEF_VPC_PROJECT, 'tmp', 'clients')
 
 	directory TMP_SG
+	directory TMP_CLIENTS
 
 	desc "Create a new group of cloud servers"
 	task :create => [ TMP_SG, "chef:validate_json" ] do
@@ -57,7 +59,7 @@ namespace :group do
 	end
 
 	desc "Delete a cloud server group"
-	task :delete do
+	task :delete => "vpn:delete" do
 		id=ENV['GROUP_ID']
 		configs=Util.load_configs
 		hash=Util.hash_for_group
@@ -72,6 +74,7 @@ namespace :group do
 			configs["cloud_servers_vpc_password"]
 		)
 		File.delete(File.join(TMP_SG, "#{id}.xml"))
+
 	end
 
 	desc "Force clean the cached server group files"
@@ -203,6 +206,96 @@ namespace :share do
 
 end
 
+namespace :vpn do
+
+	desc "Connect to a server group as a VPN client."
+	task :connect do
+
+		puts "Creating VPN Connection..."
+		configs=Util.load_configs
+		group_hash=Util.hash_for_group(configs)
+		if not File.exists?(File.join(TMP_CLIENTS, group_hash['id']+'.xml')) then
+			Rake::Task['vpn:create_client'].invoke
+			Rake::Task['vpn:poll_client'].invoke
+		end
+		client_hash=CloudServersVPC.client_hash(IO.read(File.join(TMP_CLIENTS, group_hash['id']+'.xml')))
+		ChefVPCToolkit::VpnNetworkManager.configure_gconf(group_hash, client_hash)
+		ChefVPCToolkit::VpnNetworkManager.connect(group_hash['id'])
+
+	end
+
+	desc "Disconnect from a server group as a VPN client."
+	task :disconnect do
+
+		configs=Util.load_configs
+		group_hash=Util.hash_for_group(configs)
+		ChefVPCToolkit::VpnNetworkManager.disconnect(group_hash['id'])
+
+		vpn_server_ip=group_hash["vpn-network"].chomp("0")+"1"
+		SshUtil.remove_known_hosts_ip(vpn_server_ip)
+		SshUtil.remove_known_hosts_ip("#{CloudServersVPC.vpn_server_name(group_hash)},#{vpn_server_ip}")
+
+	end
+
+	desc "Delete VPN config information."
+	task :delete do
+
+		configs=Util.load_configs
+		group_hash=Util.hash_for_group(configs)
+		group_id=group_hash['id']
+		ChefVPCToolkit::VpnNetworkManager.unset_gconf_config(group_id)
+		ChefVPCToolkit::VpnNetworkManager.delete_certs(group_id)
+		client_file=File.join(TMP_CLIENTS, "#{group_id}.xml")
+
+		vpn_server_ip=group_hash["vpn-network"].chomp("0")+"1"
+		SshUtil.remove_known_hosts_ip(vpn_server_ip)
+		SshUtil.remove_known_hosts_ip("#{CloudServersVPC.vpn_server_name(group_hash)},#{vpn_server_ip}")
+
+		if File.exists?(client_file) then
+			File.delete(client_file)
+		end
+
+	end
+
+	desc "Create a new VPN client."
+	task :create_client => [ TMP_CLIENTS ] do
+
+		configs=Util.load_configs
+		group_hash=Util.hash_for_group(configs)
+
+		vpn_client_name=ENV['HOSTNAME']
+		if not configs['vpn_client_name'].nil? then
+			vpn_client_name=configs['vpn_client_name']
+		end
+
+		xml=CloudServersVPC.create_client(group_hash, vpn_client_name)
+		client_hash=CloudServersVPC.client_hash(xml)
+		out_file=group_hash["id"]+".xml"
+		File.open(File.join(TMP_CLIENTS, out_file), 'w') { |f| f.write(xml) }
+		puts "Client ID #{client_hash['id']} created."
+		
+	end
+
+	desc "Poll until a client is online"
+	task :poll_client => TMP_CLIENTS do
+		timeout=ENV['VPN_CLIENT_TIMEOUT']
+		if timeout.nil? or timeout.empty? then
+			timeout=300 # defaults to 5 minutes
+		end
+		configs=Util.load_configs
+		group_hash=Util.hash_for_group
+		client_hash=CloudServersVPC.client_hash(IO.read(File.join(TMP_CLIENTS, group_hash['id']+'.xml')))
+		puts "Polling for client VPN cert to be created (this may take a minute)...."
+		CloudServersVPC.poll_client(client_hash["id"], timeout)
+		xml=CloudServersVPC.client_xml_for_id(configs, TMP_CLIENTS, client_hash["id"])
+		out_file=group_hash["id"]+".xml"
+		File.open(File.join(TMP_CLIENTS, out_file), 'w') { |f| f.write(xml) }
+		puts "Client VPN certs are ready to use."
+
+	end
+
+end
+
 desc "SSH into the most recently created VPN gateway server."
 task :ssh do
 	hash=Util.hash_for_group
@@ -235,6 +328,10 @@ task :rechef => [ "server:rebuild", "group:poll" ] do
 	ChefInstaller.install_chef_client(configs, server_name, client_validation_key, os_types[server_name])
 
 end
+
+desc "Alias to the vpn:connect task."
+task :vpn => "vpn:connect"
+
 
 desc "Print help and usage information"
 task :usage do

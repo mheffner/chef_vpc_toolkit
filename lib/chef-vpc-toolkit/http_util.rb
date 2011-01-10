@@ -72,6 +72,7 @@ def self.post(url_string, post_data, auth_user=nil, auth_password=nil)
 	when Net::HTTPSuccess
 		return response.body
 	else
+		puts response.body
 		response.error!
 	end
 end

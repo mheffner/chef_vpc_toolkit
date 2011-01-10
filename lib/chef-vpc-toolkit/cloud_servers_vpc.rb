@@ -83,7 +83,8 @@ module CloudServersVPC
 			hash["description"]=sg.elements["description"].text
 			hash["id"]=sg.elements["id"].text
 			hash["domain-name"]=sg.elements["domain-name"].text
-
+			hash["vpn-network"]=sg.elements["vpn-network"].text
+			hash["vpn-subnet"]=sg.elements["vpn-subnet"].text
 			hash["servers"]={}
 			REXML::XPath.each(dom, "//server") do |server|
 				server_name=server.elements["name"].text
@@ -178,6 +179,21 @@ module CloudServersVPC
 
 		names
 		
+	end
+
+	# Return the name of the VPN server within a server group
+	def self.vpn_server_name(hash)
+
+		hash["servers"].each_pair do |name, hash|
+			if hash['openvpn-server'] and hash['openvpn-server'] == "true" then
+				if block_given? then
+					yield name
+				else
+					return name
+				end
+			end	
+		end
+
 	end
 
 	# default timeout of 20 minutes
@@ -276,6 +292,96 @@ module CloudServersVPC
 		HttpUtil.post(
 			configs["cloud_servers_vpc_url"]+"/servers/#{server_id}/rebuild",
 			{},
+			configs["cloud_servers_vpc_username"],
+			configs["cloud_servers_vpc_password"]
+		)
+
+	end
+
+	def self.client_hash(xml)
+
+		hash={}
+        dom = REXML::Document.new(xml)
+        REXML::XPath.each(dom, "/client") do |client|
+
+			hash["name"]=client.elements["name"].text
+			hash["description"]=client.elements["description"].text
+			hash["id"]=client.elements["id"].text
+			hash["status"]=client.elements["status"].text
+			hash["server-group-id"]=client.elements["server-group-id"].text
+			hash["vpn-network-interfaces"]=[]
+			REXML::XPath.each(dom, "//vpn-network-interface") do |vni|
+				client_attributes={
+					"id" => vni.elements["id"].text,
+					"vpn-ip-addr" => vni.elements["vpn-ip-addr"].text,
+					"ptp-ip-addr" => vni.elements["ptp-ip-addr"].text,
+					"client-key" => vni.elements["client-key"].text,
+					"client-cert" => vni.elements["client-cert"].text,
+					"ca-cert" => vni.elements["ca-cert"].text
+				}
+				hash["vpn-network-interfaces"] << client_attributes
+			end
+		end
+
+		hash
+
+	end
+
+	def self.poll_client(client_id, timeout=300)
+
+		configs=Util.load_configs
+
+		online = false
+		count=0
+		until online or (count*5) >= timeout.to_i do
+			count+=1
+			begin
+				xml=HttpUtil.get(
+					configs["cloud_servers_vpc_url"]+"/clients/#{client_id}.xml",
+					configs["cloud_servers_vpc_username"],
+					configs["cloud_servers_vpc_password"]
+				)
+				hash=CloudServersVPC.client_hash(xml)
+
+				if hash["status"] == "Online" then
+					online = true
+				else 
+					yield hash if block_given?
+					sleep 5
+				end
+			rescue EOFError
+			end
+		end
+		if (count*20) >= timeout.to_i then
+			raise "Timeout waiting for client to come online."
+		end
+
+	end
+
+	def self.client_xml_for_id(configs, dir, id=nil)
+
+		xml=HttpUtil.get(
+			configs["cloud_servers_vpc_url"]+"/clients/#{id}.xml",
+			configs["cloud_servers_vpc_username"],
+			configs["cloud_servers_vpc_password"]
+		)
+
+	end
+
+	def self.create_client(server_group_hash, client_name)
+
+		configs=Util.load_configs
+
+		xml = Builder::XmlMarkup.new
+		xml.client do |client|
+			client.name(client_name)
+			client.description("Toolkit Client: #{client_name}")
+			client.tag! "server-group-id", server_group_hash['id']
+		end
+	
+		HttpUtil.post(
+			configs["cloud_servers_vpc_url"]+"/clients.xml",
+			xml.target!,
 			configs["cloud_servers_vpc_username"],
 			configs["cloud_servers_vpc_password"]
 		)

@@ -28,6 +28,7 @@ begin
     gemspec.add_dependency 'rake'
     gemspec.add_dependency 'builder'
     gemspec.add_dependency 'json'
+    gemspec.add_dependency 'uuidtools'
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install jeweler"
