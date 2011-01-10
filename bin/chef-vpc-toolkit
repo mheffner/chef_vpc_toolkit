@@ -58,6 +58,8 @@ if options[:upgrade]
 		FileUtils.mv("config/chef_installer.conf", "config/chef_installer.yml")
 	end
 
+	FileUtils.cp("#{Version::CHEF_VPC_TOOLKIT_ROOT}/VERSION", File.join("config", "TOOLKIT_VERSION"))
+
 else
 	exit_if_nil_or_empty(options, :name)
 
