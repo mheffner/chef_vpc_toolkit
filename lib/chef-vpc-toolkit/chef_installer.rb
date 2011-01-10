@@ -197,9 +197,10 @@ ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 #{databag_cmds}
 EOF_GATEWAY
 }
-puts "OK."
 
 end
+
+puts "OK."
 
 end
 
