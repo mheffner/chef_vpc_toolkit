@@ -22,7 +22,10 @@ namespace :group do
 
 		hash=CloudServersVPC.server_group_hash(resp)	
 		out_file=hash["id"]+".xml"
-		File.open(File.join(TMP_SG, out_file), 'w') { |f| f.write(resp) }
+		File.open(File.join(TMP_SG, out_file), 'w') do |f|
+			f.chmod(0600)
+			f.write(resp)
+		end
 		puts "Cloud server group ID #{hash['id']} created."
 		
 	end
@@ -53,7 +56,10 @@ namespace :group do
 		xml=CloudServersVPC.server_group_xml_for_id(configs, File.join(TMP_SG, '*.xml'), id)
 
 		hash=CloudServersVPC.server_group_hash(xml)
-		File.open(File.join(TMP_SG, "#{hash['id']}.xml"), 'w') { |f| f.write(xml) }
+		File.open(File.join(TMP_SG, "#{hash['id']}.xml"), 'w') do |f|
+			f.chmod(0600)
+			f.write(xml)
+		end
 		CloudServersVPC.print_server_group(hash)
 
 	end
@@ -271,7 +277,10 @@ namespace :vpn do
 		xml=CloudServersVPC.create_client(group_hash, vpn_client_name)
 		client_hash=CloudServersVPC.client_hash(xml)
 		out_file=group_hash["id"]+".xml"
-		File.open(File.join(TMP_CLIENTS, out_file), 'w') { |f| f.write(xml) }
+		File.open(File.join(TMP_CLIENTS, out_file), 'w') do |f|
+			f.chmod(0600)
+			f.write(xml)
+		end
 		puts "Client ID #{client_hash['id']} created."
 		
 	end
@@ -289,7 +298,10 @@ namespace :vpn do
 		CloudServersVPC.poll_client(client_hash["id"], timeout)
 		xml=CloudServersVPC.client_xml_for_id(configs, TMP_CLIENTS, client_hash["id"])
 		out_file=group_hash["id"]+".xml"
-		File.open(File.join(TMP_CLIENTS, out_file), 'w') { |f| f.write(xml) }
+		File.open(File.join(TMP_CLIENTS, out_file), 'w') do |f|
+			f.chmod(0600)
+			f.write(xml)
+		end
 		puts "Client VPN certs are ready to use."
 
 	end
