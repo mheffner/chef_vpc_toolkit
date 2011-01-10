@@ -58,6 +58,11 @@ if options[:upgrade]
 		FileUtils.mv("config/chef_installer.conf", "config/chef_installer.yml")
 	end
 
+	# nodes.json
+	if File.exists?("config/chef.json") then
+		FileUtils.mv("config/chef.json", "config/nodes.json")
+	end
+
 else
 	exit_if_nil_or_empty(options, :name)
 
