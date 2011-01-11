@@ -1,8 +1,13 @@
 require 'yaml'
+require 'socket'
 
 module ChefVPCToolkit
 
 module Util
+
+	def self.hostname
+		Socket.gethostname
+	end
 
 	def self.load_configs
 

@@ -269,7 +269,7 @@ namespace :vpn do
 		configs=Util.load_configs
 		group_hash=Util.hash_for_group(configs)
 
-		vpn_client_name=ENV['HOSTNAME']
+		vpn_client_name=Util.hostname
 		if not configs['vpn_client_name'].nil? then
 			vpn_client_name=configs['vpn_client_name']
 		end
