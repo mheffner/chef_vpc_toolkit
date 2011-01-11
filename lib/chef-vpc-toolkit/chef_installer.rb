@@ -72,7 +72,7 @@ end
 os_type=machine_os_types[options['chef_server_name']]
 
 data=%x{
-ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 ssh #{options['chef_server_name']} bash <<-"EOF_BASH"
 echo "Installing Chef server on: $HOSTNAME"
 EOF_BASH
@@ -81,7 +81,7 @@ EOF_GATEWAY
 puts data
 
 data=%x{
-ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 ssh #{options['chef_server_name']} bash <<-"EOF_BASH"
 #{IO.read(File.dirname(__FILE__) + "/cloud_files.bash")}
 #{IO.read(File.dirname(__FILE__) + "/chef_bootstrap/#{os_type}.bash")}
@@ -115,7 +115,7 @@ end
 def self.client_validation_key(options)
 
 client_validation_key=%x{
-ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 ssh #{options['chef_server_name']} bash <<-"EOF_BASH"
 #{IO.read(CHEF_INSTALL_FUNCTIONS)}
 print_client_validation_key
@@ -146,7 +146,7 @@ def self.install_chef_client(options, client_name, client_validation_key, os_typ
 	puts "Installing Chef client on: #{client_name}"
 
 	data=%x{
-	ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+	ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 	ssh #{client_name} bash <<-"EOF_BASH"
 	#{IO.read(File.dirname(__FILE__) + "/cloud_files.bash")}
 	#{IO.read(File.dirname(__FILE__) + "/chef_bootstrap/#{os_type}.bash")}
@@ -192,7 +192,7 @@ json.each_pair do |bag_name, items_json|
 	end
 
 data=%x{
-ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 #{IO.read(CHEF_INSTALL_FUNCTIONS)}
 #{databag_cmds}
 EOF_GATEWAY
@@ -215,7 +215,7 @@ run_list=node_json['run_list'].inspect
 node_json.delete("run_list")
 attributes=node_json.to_json.to_s
 data=%x{
-ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 #{IO.read(CHEF_INSTALL_FUNCTIONS)}
 knife_delete_node '#{client_name}'
 knife_add_node '#{client_name}' '#{run_list}' '#{attributes}'
@@ -225,7 +225,7 @@ EOF_GATEWAY
 end
 
 def self.tail_log(gateway_ip, server_name, log_file="/var/log/chef/client.log", num_lines="100")
-	%x{ssh root@#{gateway_ip} ssh #{server_name} tail -n #{num_lines} #{log_file}}
+	%x{ssh -o "StrictHostKeyChecking no" root@#{gateway_ip} ssh #{server_name} tail -n #{num_lines} #{log_file}}
 end
 
 def self.rsync_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-repos/", remote_directory="/root/cookbook-repos")
@@ -233,7 +233,7 @@ def self.rsync_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-r
 	if File.exists?(local_dir) then
 		$stdout.printf "Syncing local Chef cookbook repositories..."
 		configs=Util.load_configs
-		%x{ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_SSH"
+		%x{ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_SSH"
 			mkdir -p #{remote_directory}
 			if [ -f /usr/bin/yum ]; then
 				rpm -q rsync &> /dev/null || yum install -y -q rsync
@@ -252,7 +252,7 @@ def self.rsync_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-r
 	end
 
 	data=%x{
-	ssh root@#{options['ssh_gateway_ip']} bash <<-"EOF_SSH"
+	ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_SSH"
 	#{IO.read(File.dirname(__FILE__) + "/cloud_files.bash")}
 	#{IO.read(CHEF_INSTALL_FUNCTIONS)}
 
