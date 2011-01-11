@@ -1,7 +1,8 @@
-* Sun Jan 9 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
+* Tue Jan 11 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
   - Implement 'rake vpn' tasks.
   - Set permission to 0600 on tmp/server_group files.
-  - Move config/chef.json to config/nodes.json for upgrades.
+  - Create config/TOOLKIT_VERSION when running chef-vpc-toolkit -upgrade.
+  - Set 'StrictHostKeyChecking no' when using ssh.
 
 * Thu Dec 7 2010 Dan Prince <dan.prince@rackspace.com> - 2.0.1
   - Automatically load rake files from the tasks directory.
