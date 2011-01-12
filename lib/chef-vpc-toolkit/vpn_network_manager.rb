@@ -211,7 +211,7 @@ module VpnNetworkManager
 
 	def self.ip_to_integer(ip_string)
 		return 0 if ip_string.nil?
-		ip_arr=ip_string.each(".").collect{ |s| s.chomp(".").to_i}
+		ip_arr=ip_string.split(".").collect{ |s| s.to_i }
 		return ip_arr[0] + ip_arr[1]*2**8 + ip_arr[2]*2**16 + ip_arr[3]*2**24
 	end
 
