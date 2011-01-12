@@ -297,8 +297,10 @@ namespace :vpn do
 			Rake::Task['vpn:poll_client'].invoke
 		end
 		client=Client.fetch(:id => group.id, :source => "cache")
-		ChefVPCToolkit::VpnNetworkManager.configure_gconf(group, client)
-		ChefVPCToolkit::VpnNetworkManager.connect(group.id)
+                vpn = ChefVPCToolkit::VpnConnection.new(group, client)
+                vpn.connect
+		#ChefVPCToolkit::VpnNetworkManager.configure_gconf(group_hash, client)
+		#ChefVPCToolkit::VpnNetworkManager.connect(group_hash['id'])
 
 	end
 
@@ -306,7 +308,10 @@ namespace :vpn do
 	task :disconnect do
 
 		group=ServerGroup.fetch(:source => "cache")
-		ChefVPCToolkit::VpnNetworkManager.disconnect(group.id)
+		client=Client.fetch(:id => group.id, :source => "cache")
+                vpn = ChefVPCToolkit::VpnConnection.new(group, client)
+                vpn.disconnect
+		#ChefVPCToolkit::VpnNetworkManager.disconnect(group.id)
 
 		vpn_server_ip=group.vpn_network.chomp("0")+"1"
 		SshUtil.remove_known_hosts_ip(vpn_server_ip)
