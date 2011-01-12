@@ -39,31 +39,53 @@ To install the gem:
 
 Example commands:
 
-	- Create a new cloud server group, upload cookbooks, install chef
+	- Create a new server group, upload cookbooks, install chef
 	on all the nodes, sync share data and cookbooks.
 
 		$ rake create
 
-	- List your currently running cloud server groups.
+	- List your currently running server groups.
 
 		$ rake group:list
 
-	- SSH into the current (most recently created) cloud server group
+	- SSH into the current (most recently created) server group
 
 		$ rake ssh
 
-	- SSH into a cloud server group with an ID of 3
+	- SSH into a server group with an ID of 3
 
 		$ rake ssh GROUP_ID=3
 
-	- Delete the cloud server group with an ID of 3
+	- Delete the server group with an ID of 3
 
 		$ rake group:delete GROUP_ID=3
 
-	- Rebuild/Re-Chef the 'db1' server in the most recently created cloud
-	server group
+	- Rebuild/Re-Chef the 'db1' server in the most recently created server group
 
 		$ rake rechef SERVER_NAME=db1
+
+	- Connect to a group as a VPN client. Currently supports and requires
+     Network Manager Openvpn, nmcli, and nm-applet (Linux only).
+
+		$ rake vpn
+
+	- Disconnect from group as a VPN client
+
+		$ rake vpn:disconnect
+
+== Bash Automation Script
+The following is an example bash script to spin up a group and run commands via SSH. Useful for CI automation in Hudson, etc.
+
+	#!/bin/bash
+
+	chef-vpc-toolkit -v
+	trap "rake group:delete" INT TERM EXIT # cleanup the group on exit
+
+	rake create
+	VPN_GW=$(rake group:show | grep "VPN gateway IP" | sed -e "s|VPN gateway IP: ||")
+	ssh root@$VPN_GW bash <<-EOF_BASH
+		# do stuff here
+	EOF_BASH
 
 == Author
 
