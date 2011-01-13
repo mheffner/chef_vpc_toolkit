@@ -255,6 +255,8 @@ module CloudServersVPC
 					"rhel"
 				when 62 # RHEL 5.5
 					"rhel"
+				when 69 # Ubuntu 10.10
+					"ubuntu"
 				when 49 # Ubuntu 10.04
 					"ubuntu"
 				when 14362 # Ubuntu 9.10
