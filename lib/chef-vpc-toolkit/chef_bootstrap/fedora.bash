@@ -5,8 +5,8 @@ local INSTALL_TYPE=${1:-"CLIENT"} # CLIENT/SERVER
 	[[ "$INSTALL_TYPE" == "CLIENT" ]] || { echo "Chef server installations are not yet supported on Fedora."; exit 1; }
 
 	yum install -q -y ruby ruby-devel gcc gcc-c++ automake autoconf rubygems make &> /dev/null || { echo "Failed to install ruby, ruby-devel, etc."; exit 1; }
-	gem update --system
-	gem update
+	#gem update --system
+	#gem update
 	gem install json -v 1.1.4 --no-rdoc --no-ri &> /dev/null || \
 		{ echo "Failed to install JSON gem on $HOSTNAME."; exit 1; }
 	gem install ohai -v 0.5.6 --no-rdoc --no-ri &> /dev/null || \
