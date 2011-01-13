@@ -311,7 +311,8 @@ end
 desc "SSH into the most recently created VPN gateway server."
 task :ssh do
 	hash=Util.hash_for_group
-	exec("ssh -o \"StrictHostKeyChecking no\" root@#{hash['vpn-gateway']}")
+	args=ARGV[1, ARGV.length].join(" ")
+	exec("ssh -o \"StrictHostKeyChecking no\" root@#{hash['vpn-gateway']} #{args}")
 end
 
 desc "Create a server group, install chef, sync share data and cookbooks."
