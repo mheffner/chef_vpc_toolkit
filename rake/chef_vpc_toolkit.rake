@@ -308,8 +308,7 @@ namespace :vpn do
 	task :disconnect do
 
 		group=ServerGroup.fetch(:source => "cache")
-		client=Client.fetch(:id => group.id, :source => "cache")
-                vpn = ChefVPCToolkit::VpnConnection.new(group, client)
+                vpn = ChefVPCToolkit::VpnConnection.new(group)
                 vpn.disconnect
 		#ChefVPCToolkit::VpnNetworkManager.disconnect(group.id)
 
@@ -323,8 +322,10 @@ namespace :vpn do
 	task :delete do
 
 		group=ServerGroup.fetch(:source => "cache")
-		ChefVPCToolkit::VpnNetworkManager.unset_gconf_config(group.id)
-		ChefVPCToolkit::VpnNetworkManager.delete_certs(group.id)
+                vpn = ChefVPCToolkit::VpnConnection.new(group)
+                vpn.clean
+		#ChefVPCToolkit::VpnNetworkManager.unset_gconf_config(group.id)
+		#ChefVPCToolkit::VpnNetworkManager.delete_certs(group.id)
 
 		vpn_server_ip=group.vpn_network.chomp("0")+"1"
 		SshUtil.remove_known_hosts_ip(vpn_server_ip)

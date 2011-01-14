@@ -4,7 +4,7 @@ class VpnConnection
 
        	CERT_DIR=File.join(ENV['HOME'], '.pki', 'openvpn')
 
-        def initialize(group, client)
+        def initialize(group, client = nil)
                 @group = group
                 @client = client
         end
