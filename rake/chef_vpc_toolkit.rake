@@ -161,12 +161,20 @@ namespace :chef do
 	task :tail_logs do
 		
 		lines=ENV['LINES']
+		server=ENV['SERVER_NAME']
+		if server && server.empty?
+			server=nil
+		end
 		if lines.nil? or lines.empty? then
 			lines=100
 		end
 		configs=ChefInstaller.load_configs
 		hash=Util.hash_for_group(configs)
 		CloudServersVPC.server_names(hash) do |name|
+			if server && server != name
+				next
+			end
+
 			puts "================================================================================"
 			puts "SERVER NAME: #{name}"
 			puts ChefInstaller.tail_log(hash["vpn-gateway"], name, "/var/log/chef/client.log", lines)
