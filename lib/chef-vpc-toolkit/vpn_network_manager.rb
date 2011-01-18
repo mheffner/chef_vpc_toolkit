@@ -13,28 +13,28 @@ module VpnNetworkManager
 
 	CERT_DIR=File.join(ENV['HOME'], '.pki', 'openvpn')
 
-	def self.configure_gconf(group_hash, client_hash)
+	def self.configure_gconf(group, client)
 
-		ca_cert=File.join(CERT_DIR, group_hash['id'], 'ca.crt')
-		client_cert=File.join(CERT_DIR, group_hash['id'], 'client.crt')
-		client_key=File.join(CERT_DIR, group_hash['id'], 'client.key')
+		ca_cert=File.join(CERT_DIR, group.id.to_s, 'ca.crt')
+		client_cert=File.join(CERT_DIR, group.id.to_s, 'client.crt')
+		client_key=File.join(CERT_DIR, group.id.to_s, 'client.key')
 
-		vpn_interface=client_hash['vpn-network-interfaces'][0]
+		vpn_interface=client.vpn_network_interfaces[0]
 
-		FileUtils.mkdir_p(File.join(CERT_DIR, group_hash['id']))
+		FileUtils.mkdir_p(File.join(CERT_DIR, group.id.to_s))
 		File::chmod(0700, File.join(ENV['HOME'], '.pki'))
 		File::chmod(0700, CERT_DIR)
 
-		File.open(ca_cert, 'w') { |f| f.write(vpn_interface['ca-cert']) }
-		File.open(client_cert, 'w') { |f| f.write(vpn_interface['client-cert']) }
+		File.open(ca_cert, 'w') { |f| f.write(vpn_interface.ca_cert) }
+		File.open(client_cert, 'w') { |f| f.write(vpn_interface.client_cert) }
 		File.open(client_key, 'w') do |f|
-			f.write(vpn_interface['client-key'])
+			f.write(vpn_interface.client_key)
 			f.chmod(0600)
 		end
 
 		xml = Builder::XmlMarkup.new
 		xml.gconfentryfile do |file|
-			file.entrylist({ "base" => "/system/networking/connections/vpc_#{group_hash['id']}"}) do |entrylist|
+			file.entrylist({ "base" => "/system/networking/connections/vpc_#{group.id}"}) do |entrylist|
 
 				entrylist.entry do |entry|
 					entry.key("connection/autoconnect")
@@ -45,7 +45,7 @@ module VpnNetworkManager
 				entrylist.entry do |entry|
 					entry.key("connection/id")
 					entry.value do |value|
-						value.string("VPC Group: #{group_hash['id']}")
+						value.string("VPC Group: #{group.id}")
 					end
 				end
 				entrylist.entry do |entry|
@@ -83,7 +83,7 @@ module VpnNetworkManager
 					entry.key("ipv4/dns")
 					entry.value do |value|
 						value.list("type" => "int") do |list|
-							ip=IPAddr.new(group_hash['vpn-network'].chomp("0")+"1")
+							ip=IPAddr.new(group.vpn_network.chomp("0")+"1")
 							list.value do |lv|
 								lv.int(ip_to_integer(ip.to_s))
 							end
@@ -95,7 +95,7 @@ module VpnNetworkManager
 					entry.value do |value|
 						value.list("type" => "string") do |list|
 							list.value do |lv|
-								lv.string(group_hash['domain-name'])
+								lv.string(group.domain_name)
 							end
 						end
 					end
@@ -170,7 +170,7 @@ module VpnNetworkManager
 				entrylist.entry do |entry|
 					entry.key("vpn/remote")
 					entry.value do |value|
-						value.string(group_hash['vpn-gateway'])
+						value.string(group.vpn_gateway_ip)
 					end
 				end
 				entrylist.entry do |entry|
@@ -198,7 +198,7 @@ module VpnNetworkManager
 	end
 
 	def self.delete_certs(server_group_id)
-		FileUtils.rm_rf(File.join(CERT_DIR, server_group_id))
+		FileUtils.rm_rf(File.join(CERT_DIR, server_group_id.to_s))
 	end
 
 	def self.connect(server_group_id)

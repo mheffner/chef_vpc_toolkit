@@ -82,13 +82,6 @@ class CloudServersVPCTest < Test::Unit::TestCase
 
   end
 
-  def test_load_public_key
-
-	key=CloudServersVPC.load_public_key
-	assert_not_nil key
-
-  end
-
   def test_rebuild
 
     response={}
