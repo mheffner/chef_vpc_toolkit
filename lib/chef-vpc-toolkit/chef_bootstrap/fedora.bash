@@ -34,7 +34,7 @@ validation_key         "/etc/chef/validation.pem"
 client_key             "/etc/chef/client.pem"
 EOF_CAT
 
-	CHEF_GEM_DIR=$(gem contents chef | sed -e "s|\(.*chef-0.9.8\).*|\1|" | head -n 1)
+	CHEF_GEM_DIR=$(gem contents chef 2>/dev/null | sed -e "s|\(.*chef-0.9.8\).*|\1|" | head -n 1)
 	cp $CHEF_GEM_DIR/distro/redhat/etc/init.d/chef-client /etc/init.d/
 	cp $CHEF_GEM_DIR/distro/redhat/etc/logrotate.d/chef-client /etc/logrotate.d/
 	chmod 755 /etc/init.d/chef-client
