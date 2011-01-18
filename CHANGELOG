@@ -1,3 +1,7 @@
+* Thu Jan 13 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.0
+  - Support command execution with 'rake ssh'.
+  - The 'chef:tail_logs' task now supports the SERVER_NAME variable.
+
 * Tue Jan 11 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
   - Implement 'rake vpn' tasks.
   - Set permission to 0600 on tmp/server_group files.

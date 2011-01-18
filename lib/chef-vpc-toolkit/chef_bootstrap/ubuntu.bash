@@ -1,6 +1,7 @@
 function install_chef {
 
 CODENAME=$(cat /etc/*release | grep CODENAME | sed -e "s|^.*=\([^$]*\)$|\1|")
+[[ "$CODENAME" == "maverick" ]] && CODENAME="lucid"
 local INSTALL_TYPE=${1:-"CLIENT"} # CLIENT/SERVER
 
 [ -f /etc/apt/sources.list.d/opscode.list ] || echo "deb http://apt.opscode.com $CODENAME main" > /etc/apt/sources.list.d/opscode.list

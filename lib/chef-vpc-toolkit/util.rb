@@ -5,11 +5,15 @@ module ChefVPCToolkit
 
 module Util
 
+	@@configs=nil
+
 	def self.hostname
 		Socket.gethostname
 	end
 
 	def self.load_configs
+
+		return @@configs if not @@configs.nil?
 
 		config_file=ENV['CHEF_VPC_TOOLKIT_CONF']
 		if config_file.nil? then
@@ -26,10 +30,27 @@ module Util
 			raise_if_nil_or_empty(configs, "cloud_servers_vpc_url")
 			raise_if_nil_or_empty(configs, "cloud_servers_vpc_username")
 			raise_if_nil_or_empty(configs, "cloud_servers_vpc_password")
-			return configs
+			@@configs=configs
 		else
 			raise "Failed to load cloud toolkit config file. Please configure /etc/chef_vpc_toolkit.conf or create a .chef_vpc_toolkit.conf config file in your HOME directory."
 		end
+
+		@@configs
+
+	end
+
+	def self.load_public_key
+
+		ssh_dir=ENV['HOME']+File::SEPARATOR+".ssh"+File::SEPARATOR
+		if File.exists?(ssh_dir+"id_rsa.pub")
+			pubkey=IO.read(ssh_dir+"id_rsa.pub")
+		elsif File.exists?(ssh_dir+"id_dsa.pub")
+			pubkey=IO.read(ssh_dir+"id_dsa.pub")
+		else
+			raise "Failed to load SSH key. Please create a SSH public key pair in your HOME directory."
+		end
+
+		pubkey.chomp
 
 	end
 
@@ -37,23 +58,6 @@ module Util
 		if options[key].nil? || options[key].empty? then
 			raise "Please specify a valid #{key.to_s} parameter."
 		end
-	end
-
-	def self.hash_for_group(configs=Util.load_configs)
-
-		id=ENV['GROUP_ID']
-		configs=Util.load_configs
-		hash=nil
-		if id.nil? then
-			hash=CloudServersVPC.most_recent_server_group_hash(File.join(TMP_SG, '*.xml'))
-		else
-			file=File.join(TMP_SG, "#{id}.xml")
-			hash = CloudServersVPC.server_group_hash(IO.read(file))
-		end
-		raise "Create a cloud before running this command." if hash.nil?
-
-		hash
-
 	end
 
 end
