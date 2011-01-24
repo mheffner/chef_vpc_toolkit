@@ -30,6 +30,7 @@ fi
 
 sed -e "s|localhost|$SERVER_NAME|g" -i /etc/chef/client.rb
 sed -e "s|^chef_server_url.*|chef_server_url \"http://$SERVER_NAME:4000\"|g" -i /etc/chef/client.rb
+sed -e "s|^log_location.*|log_location \"\/var/log/chef/client.log\"|g" -i /etc/chef/client.rb
 
 local CHEF_CLIENT_CONF=/etc/default/chef-client
 [ -d /etc/sysconfig/ ] && CHEF_CLIENT_CONF=/etc/sysconfig/chef-client
