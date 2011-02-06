@@ -40,6 +40,55 @@ class Server
 		return @openvpn_server
 	end
 
+	def to_xml
+
+		xml = Builder::XmlMarkup.new
+		xml.tag! "server" do |server|
+			server.id(@id)
+			server.name(@name)
+			server.description(@description)
+			server.status(@status) if @status
+			server.tag! "external-ip-addr", @external_ip_addr if @external_ip_addr
+			server.tag! "internal-ip-addr", @internal_ip_addr if @internal_ip_addr
+			server.tag! "cloud-server-id-number", @cloud_server_id_number if @cloud_server_id_number
+			server.tag! "flavor-id", @flavor_id
+			server.tag! "image-id", @image_id
+			server.tag! "server-group-id", @server_group_id
+			server.tag! "openvpn-server", "true" if openvpn_server?
+			server.tag! "error-message", @error_message if @error_message
+		end
+		xml.target!
+
+	end
+
+	def self.from_xml(xml)
+
+		server=nil
+        dom = REXML::Document.new(xml)
+        REXML::XPath.each(dom, "/*") do |sg_xml|
+
+			server=Server.new(
+				:id => XMLUtil.element_text(sg_xml, "id").to_i,
+				:name => XMLUtil.element_text(sg_xml, "name"),
+				:flavor_id => XMLUtil.element_text(sg_xml, "flavor-id"),
+				:image_id => XMLUtil.element_text(sg_xml, "image-id"),
+				:description => XMLUtil.element_text(sg_xml, "description"),
+				:cloud_server_id_number => XMLUtil.element_text(sg_xml, "cloud-server-id-number"),
+				:description => XMLUtil.element_text(sg_xml, "description"),
+				:external_ip_addr => XMLUtil.element_text(sg_xml, "external-ip-addr"),
+				:internal_ip_addr => XMLUtil.element_text(sg_xml, "internal-ip-addr"),
+				:server_group_id => XMLUtil.element_text(sg_xml, "server-group-id"),
+				:openvpn_server => XMLUtil.element_text(sg_xml, "openvpn_server"),
+				:retry_count => XMLUtil.element_text(sg_xml, "retry-count"),
+				:error_message => XMLUtil.element_text(sg_xml, "error-message"),
+				:status => XMLUtil.element_text(sg_xml, "status")
+			)
+		end
+
+		server
+
+	end
+
 	def rebuild
 
 		configs=Util.load_configs
@@ -52,6 +101,21 @@ class Server
 			configs["cloud_servers_vpc_username"],
 			configs["cloud_servers_vpc_password"]
 		)
+
+	end
+
+	def self.create(server)
+
+		configs=Util.load_configs
+
+		xml=HttpUtil.post(
+			configs["cloud_servers_vpc_url"]+"/servers.xml",
+			server.to_xml,
+			configs["cloud_servers_vpc_username"],
+			configs["cloud_servers_vpc_password"]
+		)
+
+		server=Server.from_xml(xml)
 
 	end
 

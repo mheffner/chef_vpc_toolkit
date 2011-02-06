@@ -85,15 +85,36 @@ namespace :group do
 		puts "Cloud server group online."
 	end
 
+	desc "Add a single server to the server group."
+	task :add_server do
+		server_name=ENV['SERVER_NAME']
+		image_id=ENV['IMAGE_ID']
+		flavor_id=ENV['FLAVOR_ID']
+		raise "Please specify a SERVER_NAME." if server_name.nil?
+		raise "Please specify a IMAGE_ID." if image_id.nil?
+		raise "Please specify a FLAVOR_ID." if flavor_id.nil?
+		group=ServerGroup.fetch(:source => "cache")
+		server=Server.new(
+			:name => server_name,
+			:description => server_name,
+			:image_id => image_id,
+			:flavor_id => flavor_id,
+			:server_group_id => group.id
+		)
+		server=Server.create(server)
+		group=ServerGroup.fetch
+		group.cache_to_disk
+		puts "Server ID #{server.id} created."
+	end
+
 end
 
 namespace :server do
 
 	desc "Rebuild a server in a server group."
-	task :rebuild => TMP_SG do
+	task :rebuild do
 		server_name=ENV['SERVER_NAME']
 		raise "Please specify a SERVER_NAME." if server_name.nil?
-		configs=Util.load_configs
 		group=ServerGroup.fetch
 		server=group.server(server_name)
 		server.rebuild
@@ -225,8 +246,11 @@ namespace :vpn do
 		vpn_server_ip=group.vpn_network.chomp("0")+"1"
 		SshUtil.remove_known_hosts_ip(vpn_server_ip)
 		SshUtil.remove_known_hosts_ip("#{group.vpn_gateway_name},#{vpn_server_ip}")
-		client=Client.fetch(:id => group.id, :source => "cache")
-		client.delete if client
+		begin
+			client=Client.fetch(:id => group.id, :source => "cache")
+			client.delete if client
+		rescue
+		end
 
 	end
 
@@ -265,6 +289,9 @@ task :ssh => 'group:init' do
 
 	sg=ServerGroup.fetch(:source => "cache")
 	args=ARGV[1, ARGV.length].join(" ")
+	if ARGV[1] and ARGV[1].start_with?('GROUP_ID=')
+		args=ARGV[2, ARGV.length].join(" ")
+	end
 	exec("ssh -o \"StrictHostKeyChecking no\" root@#{sg.vpn_gateway_ip} #{args}")
 end
 

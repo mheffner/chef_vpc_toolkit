@@ -4,6 +4,7 @@ require 'fileutils'
 require 'tempfile'
 
 module ChefVPCToolkit
+module CloudServersVPC
 
 class ServerGroupTest < Test::Unit::TestCase
 
@@ -15,8 +16,6 @@ class ServerGroupTest < Test::Unit::TestCase
   def teardown
     FileUtils.rm_rf(@tmp_dir)
   end
-
-  include ChefVPCToolkit::CloudServersVPC
 
   TEST_JSON_CONFIG = %{{
         "name": "test",
@@ -217,7 +216,7 @@ class ServerGroupTest < Test::Unit::TestCase
   def test_delete
 
     sg=ServerGroup.from_xml(SERVER_GROUP_XML)
-    HttpUtil.stubs(:post).returns("")
+    HttpUtil.stubs(:delete).returns("")
     sg.delete
     assert_equal false, File.exists?(File.join(ServerGroup.data_dir, "#{sg.id}.xml"))
 
@@ -225,4 +224,5 @@ class ServerGroupTest < Test::Unit::TestCase
 
 end
 
+end
 end

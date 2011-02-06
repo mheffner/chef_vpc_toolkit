@@ -55,7 +55,7 @@ module Util
 	end
 
 	def self.raise_if_nil_or_empty(options, key)
-		if options[key].nil? || options[key].empty? then
+		if not options or options[key].nil? or options[key].empty? then
 			raise "Please specify a valid #{key.to_s} parameter."
 		end
 	end

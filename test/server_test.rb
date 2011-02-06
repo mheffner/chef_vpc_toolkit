@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 module ChefVPCToolkit
+module CloudServersVPC
 
 class ServerTest < Test::Unit::TestCase
 
@@ -30,8 +31,28 @@ class ServerTest < Test::Unit::TestCase
     server.rebuild
   end
 
+  def test_from_to_xml
+    server=Server.from_xml(SERVER_XML)
+    server=Server.from_xml(server.to_xml)
+    assert_equal "db1", server.name
+    assert_equal "blah", server.description
+    assert_equal 1234, server.id
+    assert_equal 888, server.cloud_server_id_number
+    assert_equal 999, server.server_group_id
+    assert_equal "10.119.225.116", server.internal_ip_addr
+    assert_equal "123.100.100.100", server.external_ip_addr
+    assert_equal "Online", server.status
+  end
 
+  def test_create
+
+    HttpUtil.stubs(:post).returns(SERVER_XML)
+    server=Server.create(Server.from_xml(SERVER_XML))
+    assert_equal "db1", server.name
+
+  end
 
 end
 
+end
 end

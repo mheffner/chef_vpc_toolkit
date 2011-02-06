@@ -90,7 +90,7 @@ class ServerGroup
 
 		# automatically add a key for the current user
 		sg.ssh_public_keys << SshPublicKey.new(
-			:description =>	"#{ENV['USER']}'s public key",
+			:description => "#{ENV['USER']}'s public key",
 			:public_key => Util.load_public_key
 
 		)
@@ -277,8 +277,6 @@ class ServerGroup
 		end
 
 	end
-
-
 
 	def self.create(sg)
 

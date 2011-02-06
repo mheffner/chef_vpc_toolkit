@@ -4,12 +4,12 @@
 	"description": "test description",
 	"servers": {
 		"login": {
-			"image_id": "51",
+			"image_id": "69",
 			"flavor_id": "2",
 			"openvpn_server": "true"
 		},
 		"client1": {
-			"image_id": "51",
+			"image_id": "69",
 			"flavor_id": "2"
 		}
 	}

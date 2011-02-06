@@ -172,3 +172,24 @@ QRiYX+gvycrIph1yyIGA1qeHYnjhQp4ZijhcwSFUAAyF
   </vpn-network-interfaces>
 </client>
 }
+
+SERVER_XML = %{
+
+<linux-server> 
+  <cloud-server-id-number type="integer">888</cloud-server-id-number> 
+  <created-at type="datetime">2010-07-29T10:27:33-04:00</created-at> 
+  <description>blah</description> 
+  <error-message nil="true"></error-message> 
+  <external-ip-addr>123.100.100.100</external-ip-addr> 
+  <flavor-id type="integer">3</flavor-id> 
+  <id type="integer">1234</id> 
+  <image-id type="integer">14</image-id> 
+  <internal-ip-addr>10.119.225.116</internal-ip-addr> 
+  <name>db1</name> 
+  <openvpn-server type="boolean">false</openvpn-server> 
+  <retry-count type="integer">0</retry-count> 
+  <server-group-id type="integer">999</server-group-id> 
+  <status>Online</status> 
+  <updated-at type="datetime">2010-07-29T11:19:04-04:00</updated-at> 
+</linux-server>
+}

@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 module ChefVPCToolkit
+module CloudServersVPC
 
 class ClientTest < Test::Unit::TestCase
 
@@ -88,12 +89,20 @@ class ClientTest < Test::Unit::TestCase
   def test_delete
 
     client=Client.from_xml(CLIENT_XML)
-    HttpUtil.stubs(:post).returns("")
     client.delete
     assert_equal false, File.exists?(File.join(Client.data_dir, "#{client.id}.xml"))
 
   end
 
+  def test_create
+
+    HttpUtil.stubs(:post).returns(CLIENT_XML)
+    client=Client.create(ServerGroup.from_xml(SERVER_GROUP_XML), "local")
+    assert_equal "local", client.name
+
+  end
+
 end
 
+end
 end
