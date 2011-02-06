@@ -40,6 +40,23 @@ namespace :group do
 
 	end
 
+	desc "Join a group by caching the server group data to disk."
+	task :join => [ "init" ] do
+
+		id=ENV['GROUP_ID']
+		if id.nil?
+			ENV['REMOTE']="true"
+			Rake::Task['group:list'].invoke
+			puts "Enter ID of group to join:"
+			id=STDIN.gets.chomp
+		end
+
+		sg=ServerGroup.fetch(:id => id, :source => "remote")
+		sg.cache_to_disk
+		sg.pretty_print
+
+	end
+
 	desc "Print information for a cloud server group"
 	task :show => [ "init" ] do
 
@@ -115,7 +132,7 @@ namespace :group do
 		raise "Please specify a SERVER_NAME." if server_name.nil?
 		group=ServerGroup.fetch(:source => "cache")
 		server=group.server(server_name)
-		raise "Server with server name '#{server_name}' does not exist." if server.nil?
+		raise "Server with name '#{server_name}' does not exist." if server.nil?
 		server.delete
 		puts "Server '#{server_name}' deleted."
 	end
@@ -130,6 +147,7 @@ namespace :server do
 		raise "Please specify a SERVER_NAME." if server_name.nil?
 		group=ServerGroup.fetch
 		server=group.server(server_name)
+		raise "Server with name '#{server_name}' does not exist." if server.nil?
 		server.rebuild
 	end
 
