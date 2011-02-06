@@ -21,7 +21,6 @@ class Client
 	attr_accessor :server_group_id
 
 	def initialize(options={})
-
 		@id=options[:id].to_i
 		@name=options[:name]
 		@description=options[:description]
@@ -29,7 +28,6 @@ class Client
 		@server_group_id=options[:server_group_id]
 
 		@vpn_network_interfaces=[]
-
 	end
 
 	def vpn_network_interfaces
@@ -150,13 +148,7 @@ class Client
 			client.tag! "server-group-id", server_group.id
 		end
 
-		configs=Util.load_configs
-		xml=HttpUtil.post(
-			configs["cloud_servers_vpc_url"]+"/clients.xml",
-			xml.target!,
-			configs["cloud_servers_vpc_username"],
-			configs["cloud_servers_vpc_password"]
-		)
+		xml=Connection.post("/clients.xml", xml.target!)
 		client=Client.from_xml(xml)
 		client.cache_to_disk
 		client
@@ -174,12 +166,7 @@ class Client
 
         if source == "remote" then
 			id=options[:id] or raise "Please specify a Client ID."
-			configs=Util.load_configs
-			xml=HttpUtil.get(
-				configs["cloud_servers_vpc_url"]+"/clients/#{id}.xml",
-				configs["cloud_servers_vpc_username"],
-				configs["cloud_servers_vpc_password"]
-			)
+			xml=Connection.get("/clients/#{id}.xml")
 			Client.from_xml(xml)
 		elsif source == "cache" then
 			id=options[:id] or id = ENV['GROUP_ID']

@@ -27,7 +27,7 @@ class ServerTest < Test::Unit::TestCase
   def test_rebuild
     group=ServerGroup.from_xml(SERVER_GROUP_XML)
     server=group.server("test1")
-    HttpUtil.stubs(:post).returns("")
+    Connection.stubs(:post).returns("")
     server.rebuild
   end
 
@@ -46,7 +46,7 @@ class ServerTest < Test::Unit::TestCase
 
   def test_create
 
-    HttpUtil.stubs(:post).returns(SERVER_XML)
+    Connection.stubs(:post).returns(SERVER_XML)
     server=Server.create(Server.from_xml(SERVER_XML))
     assert_equal "db1", server.name
 

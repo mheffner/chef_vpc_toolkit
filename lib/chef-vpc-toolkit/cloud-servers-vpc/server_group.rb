@@ -33,7 +33,6 @@ class ServerGroup
 	attr_reader :ssh_public_keys
 
 	def initialize(options={})
-
 		@id=options[:id]
 		@name=options[:name]
 		@description=options[:description]
@@ -228,12 +227,7 @@ class ServerGroup
 
 	def delete
 
-		configs=Util.load_configs
-        HttpUtil.delete(
-            configs["cloud_servers_vpc_url"]+"/server_groups/#{@id}.xml",
-            configs["cloud_servers_vpc_username"],
-            configs["cloud_servers_vpc_password"]
-        )
+        Connection.delete("/server_groups/#{@id}.xml")
         out_file=File.join(@@data_dir, "#{@id}.xml")
         File.delete(out_file) if File.exists?(out_file)
 
@@ -280,15 +274,7 @@ class ServerGroup
 
 	def self.create(sg)
 
-		configs=Util.load_configs
-
-		xml=HttpUtil.post(
-			configs["cloud_servers_vpc_url"]+"/server_groups.xml",
-			sg.to_xml,
-			configs["cloud_servers_vpc_username"],
-			configs["cloud_servers_vpc_password"]
-		)
-
+		xml=Connection.post("/server_groups.xml", sg.to_xml)
 		sg=ServerGroup.from_xml(xml)
 		sg.cache_to_disk
 		sg
@@ -310,12 +296,7 @@ class ServerGroup
 		end
 
 		if source == "remote" then
-			configs=Util.load_configs
-			xml=HttpUtil.get(
-				configs["cloud_servers_vpc_url"]+"/server_groups/#{id}.xml",
-				configs["cloud_servers_vpc_username"],
-				configs["cloud_servers_vpc_password"]
-			)
+			xml=Connection.get("/server_groups/#{id}.xml")
 			ServerGroup.from_xml(xml)
 		elsif source == "cache" then
 			out_file=File.join(@@data_dir, "#{id}.xml")

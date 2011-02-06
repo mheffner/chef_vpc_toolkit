@@ -19,7 +19,6 @@ class Server
 	attr_accessor :status
 
 	def initialize(options={})
-
 		@id=options[:id].to_i
 		@name=options[:name]
 		@description=options[:description] or @description=@name
@@ -33,7 +32,6 @@ class Server
 		@retry_count=options[:retry_count].to_i or 0
 		@error_message=options[:error_message]
 		@status=options[:status]
-
     end
 
 	def openvpn_server?
@@ -91,30 +89,15 @@ class Server
 
 	def rebuild
 
-		configs=Util.load_configs
-
 		raise "Error: Rebuilding the OpenVPN server is not supported at this time." if openvpn_server?
 
-		HttpUtil.post(
-			configs["cloud_servers_vpc_url"]+"/servers/#{@id}/rebuild",
-			{},
-			configs["cloud_servers_vpc_username"],
-			configs["cloud_servers_vpc_password"]
-		)
+		Connection.post("/servers/#{@id}/rebuild", {})
 
 	end
 
 	def self.create(server)
 
-		configs=Util.load_configs
-
-		xml=HttpUtil.post(
-			configs["cloud_servers_vpc_url"]+"/servers.xml",
-			server.to_xml,
-			configs["cloud_servers_vpc_username"],
-			configs["cloud_servers_vpc_password"]
-		)
-
+		xml=Connection.post("/servers.xml", server.to_xml)
 		server=Server.from_xml(xml)
 
 	end

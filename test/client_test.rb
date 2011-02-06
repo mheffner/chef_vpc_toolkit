@@ -58,7 +58,7 @@ class ClientTest < Test::Unit::TestCase
     end
     Client.data_dir=tmp_dir
 
-    HttpUtil.stubs(:get).returns(CLIENT_XML)
+    Connection.stubs(:get).returns(CLIENT_XML)
 
     # should raise exception if no ID is set and doing a remote lookup
     assert_raises(RuntimeError) do
@@ -96,7 +96,7 @@ class ClientTest < Test::Unit::TestCase
 
   def test_create
 
-    HttpUtil.stubs(:post).returns(CLIENT_XML)
+    Connection.stubs(:post).returns(CLIENT_XML)
     client=Client.create(ServerGroup.from_xml(SERVER_GROUP_XML), "local")
     assert_equal "local", client.name
 

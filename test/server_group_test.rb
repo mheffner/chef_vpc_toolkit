@@ -138,7 +138,7 @@ class ServerGroupTest < Test::Unit::TestCase
     end
     ServerGroup.data_dir=tmp_dir
 
-    HttpUtil.stubs(:get).returns(SERVER_GROUP_XML)
+    Connection.stubs(:get).returns(SERVER_GROUP_XML)
 
     sg=ServerGroup.fetch
     assert_not_nil sg
@@ -169,7 +169,7 @@ class ServerGroupTest < Test::Unit::TestCase
 
     sg=ServerGroup.from_json_config(TEST_JSON_CONFIG)
 
-    HttpUtil.stubs(:post).returns(SERVER_GROUP_XML)
+    Connection.stubs(:post).returns(SERVER_GROUP_XML)
     sg=ServerGroup.create(sg)
     assert_not_nil sg
     assert_equal "mydomain.net", sg.domain_name
@@ -216,7 +216,7 @@ class ServerGroupTest < Test::Unit::TestCase
   def test_delete
 
     sg=ServerGroup.from_xml(SERVER_GROUP_XML)
-    HttpUtil.stubs(:delete).returns("")
+    Connection.stubs(:delete).returns("")
     sg.delete
     assert_equal false, File.exists?(File.join(ServerGroup.data_dir, "#{sg.id}.xml"))
 
