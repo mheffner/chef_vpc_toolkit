@@ -2,8 +2,9 @@
   - Support command execution with 'rake ssh'.
   - The 'chef:tail_logs' task now supports the SERVER_NAME variable.
   - Support for Ubuntu 10.10 maverick.
-  - Implement 'group:add_server' task.
   - Add support for connecting to servers which require SSL client auth.
+  - Implement 'group:add_server' task.
+  - Implement 'group:delete_server' task.
 
 * Tue Jan 11 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
   - Implement 'rake vpn' tasks.

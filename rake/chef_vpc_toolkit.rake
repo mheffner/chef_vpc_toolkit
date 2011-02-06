@@ -107,6 +107,17 @@ namespace :group do
 		puts "Server ID #{server.id} created."
 	end
 
+	desc "Delete a single server from the server group."
+	task :delete_server do
+		server_name=ENV['SERVER_NAME']
+		raise "Please specify a SERVER_NAME." if server_name.nil?
+		group=ServerGroup.fetch(:source => "cache")
+		server=group.server(server_name)
+		raise "Server with server name '#{server_name}' does not exist." if server.nil?
+		server.delete
+		puts "Server '#{server_name}' deleted."
+	end
+
 end
 
 namespace :server do

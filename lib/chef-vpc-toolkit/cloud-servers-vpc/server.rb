@@ -95,6 +95,10 @@ class Server
 
 	end
 
+    def delete
+        Connection.delete("/servers/#{@id}.xml")
+    end
+
 	def self.create(server)
 
 		xml=Connection.post("/servers.xml", server.to_xml)

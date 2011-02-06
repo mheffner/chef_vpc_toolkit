@@ -52,6 +52,14 @@ class ServerTest < Test::Unit::TestCase
 
   end
 
+  def test_delete
+
+    server=Server.from_xml(SERVER_XML)
+    Connection.stubs(:delete).returns("")
+    assert server.delete
+
+  end
+
 end
 
 end

@@ -112,6 +112,7 @@ class ServerGroup
 			sg.servers("type" => "array") do |xml_servers|
 				self.servers.each do |server|
 					xml_servers.server do |xml_server|
+						xml_server.id(server.id)
 						xml_server.name(server.name)
 						xml_server.description(server.description)
 						xml_server.tag! "flavor-id", server.flavor_id
