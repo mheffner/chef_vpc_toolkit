@@ -170,9 +170,17 @@ namespace :chef do
 		configs.merge!(Util.load_configs)
 		group=ServerGroup.fetch(:source => "cache")
 		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
-		client_validation_key=ChefInstaller.install_chef_server(configs, group.os_types)
-		ChefInstaller.create_databags(configs)
-		ChefInstaller.install_chef_clients(configs, client_validation_key, group.os_types)
+
+		server_name=ENV['SERVER_NAME']
+		if server_name.nil? then
+			client_validation_key=ChefInstaller.install_chef_server(configs, group.os_types)
+			ChefInstaller.create_databags(configs)
+			ChefInstaller.install_chef_clients(configs, client_validation_key, group.os_types)
+		else
+			raise "Server with name '#{server_name}' does not exist." if group.server(server_name).nil?
+			client_validation_key=ChefInstaller.client_validation_key(configs)
+			ChefInstaller.install_chef_client(configs, server_name, client_validation_key, group.os_types[server_name])
+		end
 
 	end
 
