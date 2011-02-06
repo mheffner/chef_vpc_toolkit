@@ -46,7 +46,7 @@ class ServerGroup
     end
 
 	def server(name)
-		@servers.select {|s| s.name == name}[0]
+		@servers.select {|s| s.name == name}[0] if @servers.size > 0
 	end
 
 	def servers
@@ -54,11 +54,11 @@ class ServerGroup
 	end
 
 	def vpn_gateway_name
-		@servers.select {|s| s.openvpn_server? }[0].name
+		@servers.select {|s| s.openvpn_server? }[0].name if @servers.size > 0
 	end
 
 	def vpn_gateway_ip
-		@servers.select {|s| s.openvpn_server? }[0].external_ip_addr
+		@servers.select {|s| s.openvpn_server? }[0].external_ip_addr if @servers.size > 0
 	end
 
 	def ssh_public_keys
@@ -147,7 +147,6 @@ class ServerGroup
 		sg=nil
         dom = REXML::Document.new(xml)
         REXML::XPath.each(dom, "/server-group") do |sg_xml|
-
 			sg=ServerGroup.new(
 				:name => XMLUtil.element_text(sg_xml, "name"),
 				:id => XMLUtil.element_text(sg_xml, "id").to_i,
@@ -156,7 +155,6 @@ class ServerGroup
 				:vpn_network => XMLUtil.element_text(sg_xml, "vpn-network"),
 				:vpn_subnet => XMLUtil.element_text(sg_xml, "vpn-subnet")
 			)
-
 			REXML::XPath.each(dom, "//server") do |server_xml|
 
 				server=Server.new(
@@ -182,7 +180,7 @@ class ServerGroup
 
 	def pretty_print
 
-		puts "Cloud Group ID: #{@id}"
+		puts "Group ID: #{@id}"
 		puts "name: #{@name}"
 		puts "description: #{@description}"
 		puts "domain name: #{@domain_name}"
@@ -306,6 +304,27 @@ class ServerGroup
 		else
 			raise "Invalid fetch :source specified."
 		end
+
+	end
+
+	# :source - valid options are 'remote' and 'cache'
+	def self.list(options={})
+
+		source = options[:source] or source = "cache"
+		server_groups=[]
+		if source == "remote" then
+			xml=Connection.get("/server_groups.xml")
+			dom = REXML::Document.new(xml)
+			REXML::XPath.each(dom, "//server-group") do |group_xml|
+				server_groups << ServerGroup.from_xml(group_xml.to_s)
+			end
+		else
+			Dir[File.join(ServerGroup.data_dir, '*.xml')].each do  |file|
+				server_groups << ServerGroup.from_xml(IO.read(file))
+			end
+		end
+
+		server_groups
 
 	end
 

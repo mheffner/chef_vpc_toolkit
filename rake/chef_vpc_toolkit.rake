@@ -15,22 +15,24 @@ namespace :group do
 
 		sg=ServerGroup.from_json_config(IO.read(ServerGroup::CONFIG_FILE))
 		sg=ServerGroup.create(sg)
-		puts "Cloud server group ID #{sg.id} created."
+		puts "Server group ID #{sg.id} created."
 		
 	end
 
-	desc "List existing cloud server groups"
+	desc "List existing cloud server groups."
 	task :list => "init" do
 
-		server_groups=[]
-		Dir[File.join(ServerGroup.data_dir, '*.xml')].each do  |file|
-			server_groups << ServerGroup.from_xml(IO.read(file))
+		server_groups=nil
+		if ENV['REMOTE']
+			server_groups=ServerGroup.list(:source => "remote")
+		else
+			server_groups=ServerGroup.list(:source => "cache")
 		end
 		if server_groups.size > 0
-			puts "Cloud server groups:"
+			puts "Server groups:"
 			server_groups.sort { |a,b| b.id <=> a.id }.each do |sg|
 				gw=sg.vpn_gateway_ip.nil? ? "" : " (#{sg.vpn_gateway_ip})"
-				puts "\t#{sg.id}: #{sg.name}#{gw}"
+				puts "\t :id => #{sg.id}, :name => #{sg.name}, :owner => #{sg.owner_name}#{gw}"
 			end
 		else
 			puts "No server groups."
@@ -82,7 +84,7 @@ namespace :group do
 			end
 		end
 		Rake::Task['group:show'].invoke
-		puts "Cloud server group online."
+		puts "Server group online."
 	end
 
 	desc "Add a single server to the server group."
@@ -341,7 +343,7 @@ desc "Print help and usage information"
 task :usage do
 
 	puts ""
-	puts "Cloud Toolkit Version: #{ChefVPCToolkit::Version::VERSION}"
+	puts "Chef VPC Toolkit Version: #{ChefVPCToolkit::Version::VERSION}"
 	puts ""
 	puts "The following tasks are available:"
 
@@ -349,32 +351,38 @@ task :usage do
 	puts "----"
 	puts "Example commands:"
 	puts ""
-	puts "\t- Create a new cloud server group, upload cookbooks, install chef\n\ton all the nodes, sync share data and cookbooks."
+	puts "\t- Create a new server group, upload cookbooks, install chef\n\ton all the nodes, sync share data and cookbooks."
 	puts ""
 	puts "\t\t$ rake create"
 
 	puts ""
-	puts "\t- List your currently running cloud server groups."
+	puts "\t- List your currently running server groups."
 	puts ""
 	puts "\t\t$ rake group:list"
 
 	puts ""
-	puts "\t- SSH into the current (most recently created) cloud server group"
+	puts "\t- List all remote groups using a common Cloud Servers VPC account."
+	puts ""
+	puts "\t\t$ rake group:list REMOTE=true"
+
+
+	puts ""
+	puts "\t- SSH into the current (most recently created) server group."
 	puts ""
 	puts "\t\t$ rake ssh"
 
 	puts ""
-	puts "\t- SSH into a cloud server group with an ID of 3"
+	puts "\t- SSH into a server group with an ID of 3."
 	puts ""
 	puts "\t\t$ rake ssh GROUP_ID=3"
 
 	puts ""
-	puts "\t- Delete the cloud server group with an ID of 3"
+	puts "\t- Delete the server group with an ID of 3."
 	puts ""
 	puts "\t\t$ rake group:delete GROUP_ID=3"
 
 	puts ""
-	puts "\t- Rebuild/Re-Chef a server in the most recently created cloud\n\tserver group"
+	puts "\t- Rebuild/Re-Chef a server in the most recently created server group."
 	puts ""
 	puts "\t\t$ rake rechef SERVER_NAME=db1"
 

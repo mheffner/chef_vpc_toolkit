@@ -165,6 +165,37 @@ class ServerGroupTest < Test::Unit::TestCase
 
   end
 
+  def test_list_from_cache
+
+    tmp_dir=TmpDir.new_tmp_dir
+    File.open("#{tmp_dir}/1759.xml", 'w') do |f|
+        f.write(SERVER_GROUP_XML)
+    end
+    ServerGroup.data_dir=tmp_dir
+
+    server_groups = ServerGroup.list
+	
+	assert_equal 1, server_groups.size
+	assert_equal 1759, server_groups[0].id
+
+  end
+
+  def test_list_from_remote
+
+    tmp_dir=TmpDir.new_tmp_dir
+    File.open("#{tmp_dir}/1759.xml", 'w') do |f|
+        f.write(SERVER_GROUP_XML)
+    end
+    ServerGroup.data_dir=tmp_dir
+
+    Connection.stubs(:get).returns(SERVER_GROUP_XML)
+    server_groups = ServerGroup.list(:source => "remote")
+	
+	assert_equal 1, server_groups.size
+	assert_equal 1759, server_groups[0].id
+
+  end
+
   def test_create
 
     sg=ServerGroup.from_json_config(TEST_JSON_CONFIG)
