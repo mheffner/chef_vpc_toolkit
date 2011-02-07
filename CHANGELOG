@@ -6,8 +6,11 @@
   - Implement 'group:add_server' task.
   - Implement 'group:delete_server' task.
   - Implement 'group:list REMOTE=true' task.
-  - Implement 'group:join task.
+  - Implement 'group:join' task.
+  - Implement 'group:join' task.
   - Update the 'chef:install' task to support the SERVER_NAME variable.
+  - The 'chef:sync_repos' task is now 'chef:push_repos'.
+  - Implement a 'chef:pull_repos' task.
 
 * Tue Jan 11 2011 Dan Prince <dan.prince@rackspace.com> - 2.1.0
   - Implement 'rake vpn' tasks.

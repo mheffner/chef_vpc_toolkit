@@ -209,13 +209,26 @@ namespace :chef do
 
 	end
 
-	desc "Sync the local cookbook repos directory to the Chef server."
-	task :sync_repos do
+	#Deprecated
+	task :sync_repos => "chef:push_repos"
+
+	desc "Push/Extract cookbook repos to the server group."
+	task :push_repos do
 
 		configs=ChefInstaller.load_configs
 		group=ServerGroup.fetch(:source => "cache")
 		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
 		ChefInstaller.rsync_cookbook_repos(configs)
+
+	end
+
+	desc "Pull cookbook repos from the server group to the local project."
+	task :pull_repos do
+
+		configs=ChefInstaller.load_configs
+		group=ServerGroup.fetch(:source => "cache")
+		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
+		ChefInstaller.pull_cookbook_repos(configs)
 
 	end
 
@@ -339,7 +352,7 @@ task :create do
 
 	Rake::Task['group:create'].invoke
 	Rake::Task['group:poll'].invoke
-	Rake::Task['chef:sync_repos'].invoke
+	Rake::Task['chef:push_repos'].invoke
 	Rake::Task['chef:install'].invoke
 	#Rake::Task['share:sync'].invoke
 

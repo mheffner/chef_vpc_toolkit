@@ -228,10 +228,17 @@ def self.tail_log(gateway_ip, server_name, log_file="/var/log/chef/client.log", 
 	%x{ssh -o "StrictHostKeyChecking no" root@#{gateway_ip} ssh #{server_name} tail -n #{num_lines} #{log_file}}
 end
 
+
+def self.pull_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-repos/", remote_directory="/root/cookbook-repos")
+	$stdout.printf "Pulling remote Chef cookbook repositories..."
+	system("rsync -azL root@#{options['ssh_gateway_ip']}:#{remote_directory}/* '#{local_dir}'")
+	puts "OK"
+end
+
 def self.rsync_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-repos/", remote_directory="/root/cookbook-repos")
 
 	if File.exists?(local_dir) then
-		$stdout.printf "Syncing local Chef cookbook repositories..."
+		$stdout.printf "Pushing local Chef cookbook repositories..."
 		configs=Util.load_configs
 		%x{ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_SSH"
 			mkdir -p #{remote_directory}
