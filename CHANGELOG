@@ -1,4 +1,4 @@
-* Thu Jan 13 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.0
+* Thu Feb 6 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.0
   - Support command execution with 'rake ssh'.
   - The 'chef:tail_logs' task now supports the SERVER_NAME variable.
   - Support for Ubuntu 10.10 maverick.
