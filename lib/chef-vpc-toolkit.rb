@@ -1,6 +1,5 @@
 require 'chef-vpc-toolkit/util'
 require 'chef-vpc-toolkit/chef_installer'
-require 'chef-vpc-toolkit/http_util'
 require 'chef-vpc-toolkit/ssh_util'
 require 'chef-vpc-toolkit/version'
 require 'chef-vpc-toolkit/xml_util'
