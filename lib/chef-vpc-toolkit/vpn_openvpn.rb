@@ -62,7 +62,7 @@ dev tun
 proto tcp
 
 #Change my.publicdomain.com to your public domain or IP address
-remote #{@group.vpn_gateway} 1194
+remote #{@group.vpn_gateway_ip} 1194
 
 resolv-retry infinite
 nobind
