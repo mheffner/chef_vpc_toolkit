@@ -341,7 +341,7 @@ task :ssh => 'group:init' do
 
 	sg=ServerGroup.fetch(:source => "cache")
 	args=ARGV[1, ARGV.length].join(" ")
-	if ARGV[1] and ARGV[1].start_with?('GROUP_ID=')
+	if ARGV[1] and ARGV[1] =~ /^GROUP_ID=/
 		args=ARGV[2, ARGV.length].join(" ")
 	end
 	exec("ssh -o \"StrictHostKeyChecking no\" root@#{sg.vpn_gateway_ip} #{args}")

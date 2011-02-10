@@ -42,7 +42,7 @@ MULTI_PART_BOUNDARY="jtZ!pZ1973um"
 
 			if ssl_key then
 				pkey_data=IO.read(ssl_key)
-				if pkey_data.start_with?("-----BEGIN RSA PRIVATE KEY-----")
+				if pkey_data =~ /^-----BEGIN RSA PRIVATE KEY-----/
 					@@http.key=OpenSSL::PKey::RSA.new(pkey_data)
 				else
 					@@http.key=OpenSSL::PKey::DSA.new(pkey_data)
