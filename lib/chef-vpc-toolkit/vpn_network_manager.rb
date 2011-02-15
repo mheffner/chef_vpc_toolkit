@@ -167,6 +167,14 @@ module VpnNetworkManager
 						value.string("yes")
 					end
 				end
+				if group.vpn_device == "tap"
+					entrylist.entry do |entry|
+						entry.key("vpn/tap-dev")
+						entry.value do |value|
+							value.string("yes")
+						end
+					end
+				end
 				entrylist.entry do |entry|
 					entry.key("vpn/remote")
 					entry.value do |value|

@@ -26,6 +26,7 @@ if ! dpkg -L chef &> /dev/null; then
 
 	/etc/init.d/chef-client stop &> /dev/null
 	sleep 2
+	kill -9 $(pgrep chef-client) || true
 	rm /var/log/chef/client.log
 
 fi

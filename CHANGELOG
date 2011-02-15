@@ -1,3 +1,7 @@
+* Thu Feb 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.1
+  - Support for setting server group VPN device (tap/tun)
+  - Fix issue where chef client would occasionally not start on Ubuntu.
+
 * Thu Feb 6 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.0
   - Support command execution with 'rake ssh'.
   - The 'chef:tail_logs' task now supports the SERVER_NAME variable.
@@ -6,7 +10,6 @@
   - Implement 'group:add_server' task.
   - Implement 'group:delete_server' task.
   - Implement 'group:list REMOTE=true' task.
-  - Implement 'group:join' task.
   - Implement 'group:join' task.
   - Update the 'chef:install' task to support the SERVER_NAME variable.
   - The 'chef:sync_repos' task is now 'chef:push_repos'.

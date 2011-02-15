@@ -26,6 +26,7 @@ class ServerGroup
 	attr_accessor :name
 	attr_accessor :description
 	attr_accessor :domain_name
+	attr_accessor :vpn_device
 	attr_accessor :vpn_network
 	attr_accessor :vpn_subnet
 	attr_accessor :owner_name
@@ -37,6 +38,7 @@ class ServerGroup
 		@name=options[:name]
 		@description=options[:description]
 		@domain_name=options[:domain_name]
+		@vpn_device=options[:vpn_device] or @vpn_device="tun"
 		@vpn_network=options[:vpn_network] or @vpn_network="172.19.0.0"
 		@vpn_subnet=options[:vpn_subnet] or @vpn_subnet="255.255.128.0"
 		@owner_name=options[:owner_name] or @owner_name=ENV['USER']
@@ -74,6 +76,7 @@ class ServerGroup
 			:name => json_hash["name"],
 			:description => json_hash["description"],
 			:domain_name => json_hash["domain_name"],
+			:vpn_device => json_hash["vpn_device"],
 			:vpn_network => json_hash["vpn_network"],
 			:vpn_subnet => json_hash["vpn_subnet"]
 			)
@@ -107,6 +110,7 @@ class ServerGroup
 			sg.description(@description)
 			sg.tag! "owner-name", @owner_name
 			sg.tag! "domain-name", @domain_name
+			sg.tag! "vpn-device", @vpn_device
 			sg.tag! "vpn-network", @vpn_network
 			sg.tag! "vpn-subnet", @vpn_subnet
 			sg.servers("type" => "array") do |xml_servers|
@@ -152,6 +156,7 @@ class ServerGroup
 				:id => XMLUtil.element_text(sg_xml, "id").to_i,
 				:domain_name => XMLUtil.element_text(sg_xml, "domain-name"),
 				:description => XMLUtil.element_text(sg_xml, "description"),
+				:vpn_device => XMLUtil.element_text(sg_xml, "vpn-device"),
 				:vpn_network => XMLUtil.element_text(sg_xml, "vpn-network"),
 				:vpn_subnet => XMLUtil.element_text(sg_xml, "vpn-subnet")
 			)
