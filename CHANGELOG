@@ -1,6 +1,7 @@
-* Thu Feb 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.1
+* Thu Feb 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.3.0
   - Support for setting server group VPN device (tap/tun)
   - Fix issue where chef client would occasionally not start on Ubuntu.
+  - Use regex's instead of start_with? (support Ruby 1.8.6)
 
 * Thu Feb 6 2011 Dan Prince <dan.prince@rackspace.com> - 2.2.0
   - Support command execution with 'rake ssh'.
