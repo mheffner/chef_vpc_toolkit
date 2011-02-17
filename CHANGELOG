@@ -1,3 +1,6 @@
+* Thu Feb 17 2011 Dan Prince <dan.prince@rackspace.com> - 2.3.1
+  - Ignore kill errors when bootstrapping Chef on Ubuntu.
+
 * Thu Feb 15 2011 Dan Prince <dan.prince@rackspace.com> - 2.3.0
   - Support for setting server group VPN device (tap/tun)
   - Fix issue where chef client would occasionally not start on Ubuntu.
