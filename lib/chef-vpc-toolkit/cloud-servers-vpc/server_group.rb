@@ -154,6 +154,7 @@ class ServerGroup
 			sg=ServerGroup.new(
 				:name => XMLUtil.element_text(sg_xml, "name"),
 				:id => XMLUtil.element_text(sg_xml, "id").to_i,
+				:owner_name => XMLUtil.element_text(sg_xml, "owner-name"),
 				:domain_name => XMLUtil.element_text(sg_xml, "domain-name"),
 				:description => XMLUtil.element_text(sg_xml, "description"),
 				:vpn_device => XMLUtil.element_text(sg_xml, "vpn-device"),
