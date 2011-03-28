@@ -164,8 +164,8 @@ knife node delete "$NODE_NAME.$DOMAIN_NAME" -y &> /dev/null || \
 knife client delete "$NODE_NAME.$DOMAIN_NAME" -y &> /dev/null || \
   { echo "Failed to delete client with knife. Ignoring..."; }
 
-    #delete any entries from the status.out file
-	sed -e "/^$NODE_NAME:.*/d" -i $STATUS_MONITOR_DIR/status.out
+    #send a reset notification for the Chef client status monitor
+    echo "$NODE_NAME:RESET" | nc localhost $CHEF_STATUS_PORT
 }
 
 function knife_create_databag {
@@ -278,7 +278,7 @@ if [ -f /usr/bin/yum ]; then
 elif [ -f /usr/bin/dpkg ]; then
     dpkg -L netcat-openbsd > /dev/null 2>&1 || apt-get install -y --quiet netcat-openbsd > /dev/null 2>&1
 else
-    echo "Failed to install netcat. (for Chef status monitoring)"
+    echo "Failed to install netcat. (for Chef client status monitoring)"
     exit 1
 fi
 
@@ -286,7 +286,7 @@ mkdir -p $STATUS_MONITOR_DIR
 cat >> $STATUS_MONITOR_DIR/server.sh <<-EOF_NC_NOTIFY_SERVER
 #!/bin/bash
 while true; do
-nc -q -1 -d -k -l $CHEF_STATUS_PORT > $STATUS_MONITOR_DIR/status.out
+nc -d -k -l $CHEF_STATUS_PORT > $STATUS_MONITOR_DIR/status.out
 done
 EOF_NC_NOTIFY_SERVER
 bash $STATUS_MONITOR_DIR/server.sh &> /dev/null < /dev/null &
