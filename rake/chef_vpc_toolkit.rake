@@ -189,7 +189,7 @@ namespace :chef do
 		
 		lines=ENV['LINES']
 		server=ENV['SERVER_NAME']
-		if server && server.empty?
+		if server and server.empty?
 			server=nil
 		end
 		if lines.nil? or lines.empty? then
@@ -198,7 +198,7 @@ namespace :chef do
 		configs=ChefInstaller.load_configs
 		group=ServerGroup.fetch(:source => "cache")
 		group.server_names do |name|
-			if server && server != name
+			if server and server != name
 				next
 			end
 
@@ -206,6 +206,25 @@ namespace :chef do
 			puts "SERVER NAME: #{name}"
 			puts ChefInstaller.tail_log(group.vpn_gateway_ip, name, "/var/log/chef/client.log", lines)
 		end
+
+	end
+
+	desc "Poll for Chef clients to finish running."
+	task :poll_clients do
+		
+		server_list=ENV['SERVER_NAME']
+		timeout=ENV['CHEF_TIMEOUT']
+		group=ServerGroup.fetch(:source => "cache")
+		if server_list.nil? or server_list.empty?
+		    server_list=group.server_names.collect{|x| x+" "}.to_s
+		end
+		if timeout.nil? or timeout.empty?
+            timeout=600
+        end
+		configs=ChefInstaller.load_configs
+		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
+        puts "Polling for Chef clients to finish running..."
+        ChefInstaller.poll_clients(configs, server_list, timeout)
 
 	end
 

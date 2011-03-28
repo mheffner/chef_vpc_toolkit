@@ -92,6 +92,7 @@ mkdir -p /root/cookbook-repos
 
 configure_chef_server
 start_chef_server
+start_notification_server
 
 #{configure_client_script}
 
@@ -276,6 +277,22 @@ def self.rsync_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-r
 	EOF_SSH
 	}
 	puts data
+
+end
+
+def self.poll_clients(options, client_names, timeout=600)
+
+output=%x{
+ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+ssh #{options['chef_server_name']} bash <<-"EOF_BASH"
+#{IO.read(CHEF_INSTALL_FUNCTIONS)}
+poll_chef_client_online "#{client_names}" "#{timeout}"
+EOF_BASH
+EOF_GATEWAY
+}
+retval=$?
+puts output
+return retval.success?
 
 end
 

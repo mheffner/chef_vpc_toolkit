@@ -1,4 +1,6 @@
 # Installation functions for Chef 0.8 RPMs obtained from the ELFF repo.
+export CHEF_STATUS_PORT="1234"
+export STATUS_MONITOR_DIR="/root/status_monitor"
 
 function configure_chef_server {
 
@@ -28,18 +30,49 @@ $CLIENT_VALIDATION_KEY
 	sed -e "/^$/d" -i /etc/chef/validation.pem
 fi
 
-sed -e "s|localhost|$SERVER_NAME|g" -i /etc/chef/client.rb
-sed -e "s|^chef_server_url.*|chef_server_url \"http://$SERVER_NAME:4000\"|g" -i /etc/chef/client.rb
-sed -e "s|^log_location.*|log_location \"\/var/log/chef/client.log\"|g" -i /etc/chef/client.rb
+local CLIENT_CONFIG="/etc/chef/client.rb"
+local CHEF_NOTIFICATION_HANDLER=/var/lib/chef/handlers/netcat.rb
+sed -e "s|localhost|$SERVER_NAME|g" -i $CLIENT_CONFIG
+sed -e "s|^chef_server_url.*|chef_server_url \"http://$SERVER_NAME:4000\"|g" -i $CLIENT_CONFIG
+sed -e "s|^log_location.*|log_location \"\/var/log/chef/client.log\"|g" -i $CLIENT_CONFIG
+cat >> $CLIENT_CONFIG <<-EOF_CAT_CHEF_CLIENT_CONF
+# custom Chef notification handler
+require "$CHEF_NOTIFICATION_HANDLER"
+netcat_handler = NetcatHandler.new
+report_handlers << netcat_handler
+exception_handlers << netcat_handler
+EOF_CAT_CHEF_CLIENT_CONF
 
-local CHEF_CLIENT_CONF=/etc/default/chef-client
-[ -d /etc/sysconfig/ ] && CHEF_CLIENT_CONF=/etc/sysconfig/chef-client
-cat > $CHEF_CLIENT_CONF <<-"EOF_CAT_CHEF_CLIENT_CONF"
+
+local CHEF_SYSCONFIG=/etc/default/chef-client
+[ -d /etc/sysconfig/ ] && CHEF_SYSCONFIG=/etc/sysconfig/chef-client
+cat > $CHEF_SYSCONFIG <<-"EOF_CAT_CHEF_SYSCONFIG"
 INTERVAL=600
 SPLAY=20
 CONFIG=/etc/chef/client.rb
 LOGFILE=/var/log/chef/client.log
-EOF_CAT_CHEF_CLIENT_CONF
+EOF_CAT_CHEF_SYSCONFIG
+
+mkdir -p /var/lib/chef/handlers
+cat > $CHEF_NOTIFICATION_HANDLER <<-EOF_CHEF_NOTIFY
+require 'socket'
+class NetcatHandler < Chef::Handler
+    def report
+        begin
+            socket = TCPSocket.open('$SERVER_NAME', $CHEF_STATUS_PORT)
+            hostname=%x{hostname}.chomp
+            if success?
+                socket.write("#{hostname}:ONLINE\n")
+            else
+                socket.write("#{hostname}:FAILURE\n")
+            end
+            socket.close()
+        rescue Exception => e
+            Chef::Log.error("Netcat handler failed: " + e.message)
+        end
+    end
+end
+EOF_CHEF_NOTIFY
 
 }
 
@@ -131,6 +164,8 @@ knife node delete "$NODE_NAME.$DOMAIN_NAME" -y &> /dev/null || \
 knife client delete "$NODE_NAME.$DOMAIN_NAME" -y &> /dev/null || \
   { echo "Failed to delete client with knife. Ignoring..."; }
 
+    #delete any entries from the status.out file
+	sed -e "/^$NODE_NAME:.*/d" -i $STATUS_MONITOR_DIR/status.out
 }
 
 function knife_create_databag {
@@ -229,5 +264,63 @@ function start_chef_client {
     if [ -f /sbin/chkconfig ]; then
 		chkconfig chef-client on
 	fi
+
+}
+
+
+function start_notification_server {
+
+
+[ -d "$STATUS_MONITOR_DIR" ] && return 0;
+
+if [ -f /usr/bin/yum ]; then
+    rpm -q nc &> /dev/null || yum install -y -q nc
+elif [ -f /usr/bin/dpkg ]; then
+    dpkg -L netcat-openbsd > /dev/null 2>&1 || apt-get install -y --quiet netcat-openbsd > /dev/null 2>&1
+else
+    echo "Failed to install netcat. (for Chef status monitoring)"
+    exit 1
+fi
+
+mkdir -p $STATUS_MONITOR_DIR
+cat >> $STATUS_MONITOR_DIR/server.sh <<-EOF_NC_NOTIFY_SERVER
+#!/bin/bash
+while true; do
+nc -l $CHEF_STATUS_PORT >> $STATUS_MONITOR_DIR/status.out
+done
+EOF_NC_NOTIFY_SERVER
+bash $STATUS_MONITOR_DIR/server.sh &> /dev/null < /dev/null &
+
+}
+
+function poll_chef_client_online {
+
+local CLIENT_NAMES=${1:?"Please specify a chef client name."}
+local SECS=${2:-"600"} #10 minutes
+
+local SLEEP_COUNT=5
+local COUNT=1
+local MAX_COUNT=$(( $SECS / $SLEEP_COUNT ))
+local FAILED_CLIENTS=""
+local ALL_ONLINE="true"
+until (( $COUNT == $MAX_COUNT )); do
+    ALL_ONLINE="true"
+    FAILED_CLIENTS=""
+    for NAME in $CLIENT_NAMES; do
+            if ! grep "$NAME:" $STATUS_MONITOR_DIR/status.out | tail -n 1 | grep -c ":ONLINE" &> /dev/null; then
+                ALL_ONLINE="false"
+                FAILED_CLIENTS="$NAME $FAILED_CLIENTS"
+            fi
+    done
+    if [[ $ALL_ONLINE == "true" ]]; then
+        echo "All Chef client(s) ran successfully."
+        return 0
+    fi
+    COUNT=$(( $COUNT + 1 ))
+    sleep $SLEEP_COUNT
+done
+
+echo "Chef client(s) failed to run: $FAILED_CLIENTS"
+return 1
 
 }
