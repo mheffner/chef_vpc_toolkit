@@ -286,10 +286,14 @@ mkdir -p $STATUS_MONITOR_DIR
 cat >> $STATUS_MONITOR_DIR/server.sh <<-EOF_NC_NOTIFY_SERVER
 #!/bin/bash
 while true; do
-nc -l $CHEF_STATUS_PORT >> $STATUS_MONITOR_DIR/status.out
+nc -q -1 -d -k -l $CHEF_STATUS_PORT > $STATUS_MONITOR_DIR/status.out
 done
 EOF_NC_NOTIFY_SERVER
 bash $STATUS_MONITOR_DIR/server.sh &> /dev/null < /dev/null &
+
+if [ -f /etc/rc.local ]; then
+    echo "bash $STATUS_MONITOR_DIR/server.sh &> /dev/null < /dev/null &" >> /etc/rc.local
+fi
 
 }
 
