@@ -19,6 +19,7 @@ class Client
 	attr_accessor :description
 	attr_accessor :status
 	attr_accessor :server_group_id
+	attr_accessor :cache_file
 
 	def initialize(options={})
 		@id=options[:id].to_i
@@ -26,6 +27,7 @@ class Client
 		@description=options[:description]
 		@status=options[:status] or @status = "Pending"
 		@server_group_id=options[:server_group_id]
+		@cache_file=options[:cache_file] or options[:server_group_id]
 
 		@vpn_network_interfaces=[]
 	end
@@ -36,14 +38,14 @@ class Client
 
     def cache_to_disk
         FileUtils.mkdir_p(@@data_dir)
-        File.open(File.join(@@data_dir, "#{@server_group_id}.xml"), 'w') do |f|
+        File.open(File.join(@@data_dir, "#{@cache_file}.xml"), 'w') do |f|
             f.chmod(0600)
             f.write(self.to_xml)
         end
     end
 
 	def delete
-		client_xml_file=File.join(@@data_dir, "#{@server_group_id}.xml")
+		client_xml_file=File.join(@@data_dir, "#{@cache_file}.xml")
         if File.exists?(client_xml_file) then
             File.delete(client_xml_file)
         end
@@ -139,7 +141,7 @@ class Client
 
 	end
 
-	def self.create(server_group, client_name)
+	def self.create(server_group, client_name, cache_to_disk=true)
 
 		xml = Builder::XmlMarkup.new
 		xml.client do |client|
@@ -150,14 +152,14 @@ class Client
 
 		xml=Connection.post("/clients.xml", xml.target!)
 		client=Client.from_xml(xml)
-		client.cache_to_disk
+		client.cache_to_disk if cache_to_disk
 		client
 
 	end
 
-    # Fetch a server group. The following options are available:
+    # Fetch a client. The following options are available:
     #
-    # :id - The ID of the group containing the client to fetch.
+    # :id - The ID of the client to fetch.
     # :source - valid options are 'remote' and 'cache'
     #
 	def self.fetch(options = {})

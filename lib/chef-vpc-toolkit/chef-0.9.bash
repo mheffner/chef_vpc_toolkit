@@ -207,6 +207,7 @@ echo -n "Downloading $CB_REPO..."
 		download_cloud_file "$CB_REPO" "/tmp/cookbook-repo.tar.gz"
 	fi
 echo "OK"
+[ -d "$REPOS_BASEDIR" ] || mkdir -p "$REPOS_BASEDIR"
 cd $REPOS_BASEDIR
 echo -n "Extracting $CB_REPO..."
 tar xzf /tmp/cookbook-repo.tar.gz
