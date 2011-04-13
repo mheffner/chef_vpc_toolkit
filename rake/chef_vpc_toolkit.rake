@@ -393,6 +393,32 @@ task :rechef => [ "server:rebuild", "group:poll" ] do
 
 end
 
+desc "Use rdesktop to connect to Windows servers."
+task :rdesktop => 'group:init' do
+
+    server_name=ENV['SERVER_NAME']
+    raise "Please specify a SERVER_NAME." if server_name.nil?
+
+    use_public_ip=ENV['PUBLIC_IP'] #useful for debugging failed VPN connections
+
+    sg=ServerGroup.fetch(:source => "cache")
+
+    if use_public_ip.nil? then
+        local_ip=%x{ssh -o \"StrictHostKeyChecking no\" root@#{sg.vpn_gateway_ip} grep #{server_name}.#{sg.domain_name} /etc/hosts | cut -f 1}.chomp
+        pass=sg.server(server_name).admin_password
+        %x{
+        ssh root@#{sg.vpn_gateway_ip} -L 1234:#{local_ip}:3389 'sleep 3 & exit' &
+        sleep 1
+        rdesktop localhost:1234 -u Administrator -p #{pass}
+        }
+    else
+        pass=sg.server(server_name).admin_password
+        ip=sg.server(server_name).external_ip_addr
+        exec("rdesktop #{ip} -u Administrator -p #{pass}")
+    end
+
+end
+
 desc "Alias to the vpn:connect task."
 task :vpn => "vpn:connect"
 

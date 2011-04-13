@@ -1,6 +1,7 @@
 * Thu Apr 13 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.0
   - Make /root/cookbook-repos on the Chef server if it doesn't exist.
   - Add cache_file option to the VPC Client class.
+  - Implement 'rdesktop' task for Windows servers.
 
 * Thu Mar 27 2011 Dan Prince <dan.prince@rackspace.com> - 2.4.0
   - Implement 'chef:poll_clients' task.

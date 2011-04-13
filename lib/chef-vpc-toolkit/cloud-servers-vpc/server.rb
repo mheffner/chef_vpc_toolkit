@@ -17,6 +17,7 @@ class Server
 	attr_accessor :retry_count
 	attr_accessor :error_message
 	attr_accessor :status
+	attr_accessor :admin_password
 
 	def initialize(options={})
 		@id=options[:id].to_i
@@ -27,6 +28,7 @@ class Server
 		@cloud_server_id_number=options[:cloud_server_id_number].to_i
 		@flavor_id=options[:flavor_id].to_i
 		@image_id=options[:image_id].to_i
+		@admin_password=options[:admin_password]
 		@server_group_id=options[:server_group_id].to_i
 		@openvpn_server = [true, "true"].include?(options[:openvpn_server])
 		@retry_count=options[:retry_count].to_i or 0
@@ -51,6 +53,7 @@ class Server
 			server.tag! "cloud-server-id-number", @cloud_server_id_number if @cloud_server_id_number
 			server.tag! "flavor-id", @flavor_id
 			server.tag! "image-id", @image_id
+			server.tag! "admin-password", @admin_password
 			server.tag! "server-group-id", @server_group_id
 			server.tag! "openvpn-server", "true" if openvpn_server?
 			server.tag! "error-message", @error_message if @error_message
@@ -70,6 +73,7 @@ class Server
 				:name => XMLUtil.element_text(sg_xml, "name"),
 				:flavor_id => XMLUtil.element_text(sg_xml, "flavor-id"),
 				:image_id => XMLUtil.element_text(sg_xml, "image-id"),
+				:admin_password => XMLUtil.element_text(sg_xml, "admin-password"),
 				:description => XMLUtil.element_text(sg_xml, "description"),
 				:cloud_server_id_number => XMLUtil.element_text(sg_xml, "cloud-server-id-number"),
 				:description => XMLUtil.element_text(sg_xml, "description"),

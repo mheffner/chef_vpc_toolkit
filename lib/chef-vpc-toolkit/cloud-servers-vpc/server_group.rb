@@ -121,6 +121,9 @@ class ServerGroup
 						xml_server.description(server.description)
 						xml_server.tag! "flavor-id", server.flavor_id
 						xml_server.tag! "image-id", server.image_id
+                        if server.admin_password then
+						    xml_server.tag! "admin-password", server.admin_password
+                        end
 						xml_server.tag! "cloud-server-id-number", server.cloud_server_id_number if server.cloud_server_id_number
 						xml_server.tag! "status", server.status if server.status
 						xml_server.tag! "external-ip-addr", server.external_ip_addr if server.external_ip_addr
@@ -172,6 +175,7 @@ class ServerGroup
 					:internal_ip_addr => XMLUtil.element_text(server_xml, "internal-ip-addr"),
 					:error_message => XMLUtil.element_text(server_xml, "error-message"),
 					:image_id => XMLUtil.element_text(server_xml, "image-id"),
+					:admin_password => XMLUtil.element_text(server_xml, "admin-password"),
 					:flavor_id => XMLUtil.element_text(server_xml, "flavor-id"),
 					:retry_count => XMLUtil.element_text(server_xml, "retry-count"),
 					:openvpn_server => XMLUtil.element_text(server_xml, "openvpn-server")
