@@ -86,16 +86,16 @@ The following is an example bash script to spin up a group and run commands via 
 	chef-vpc-toolkit -v
 	trap "rake group:delete" INT TERM EXIT # cleanup the group on exit
 
-    # create a server group and Chef (includes Chef Server, cookbooks, clients)
+	# create a server group and Chef (includes Chef Server, cookbooks, clients)
 	rake create
 
-    # wait for Chef clients to finish running
+	# wait for Chef clients to finish running
 	rake chef:poll_clients
 
-    # Run some scripts on the login server
-    rake ssh bash <<-EOF_BASH
-        echo 'It works!'
-    EOF_BASH
+	# Run some scripts on the login server
+	rake ssh bash <<-EOF_BASH
+		echo 'It works!'
+	EOF_BASH
 
 == Author
 
