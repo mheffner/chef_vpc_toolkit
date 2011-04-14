@@ -399,7 +399,9 @@ task :rdesktop => 'group:init' do
     server_name=ENV['SERVER_NAME']
     raise "Please specify a SERVER_NAME." if server_name.nil?
 
-    use_public_ip=ENV['PUBLIC_IP'] #useful for debugging failed VPN connections
+    # VPC machines have their public IPs disabled
+    # This option is useful for debugging failed VPN connections
+    use_public_ip=ENV['PUBLIC_IP']
 
     sg=ServerGroup.fetch(:source => "cache")
 
