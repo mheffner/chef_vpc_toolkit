@@ -44,6 +44,7 @@ class ServerGroup
 		@owner_name=options[:owner_name] or @owner_name=ENV['USER']
 
 		@servers=[]
+		@clients=[]
 		@ssh_public_keys=[]
     end
 
@@ -54,6 +55,14 @@ class ServerGroup
 	def servers
 		@servers
 	end
+
+	def client(name)
+		@clients.select {|s| s.name == name}[0] if @clients.size > 0
+	end
+
+    def clients
+        @clients
+    end
 
 	def vpn_gateway_name
 		@servers.select {|s| s.openvpn_server? }[0].name if @servers.size > 0
@@ -144,6 +153,17 @@ class ServerGroup
 					end
 				end
 			end
+			sg.tag! "clients", { "type" => "array"} do |xml_clients|
+				self.clients.each do |client|
+					xml_clients.tag! "client" do |xml_client|
+						xml_client.id client.id
+						xml_client.name client.name
+						xml_client.description client.description
+						xml_client.status client.status
+					end
+				end
+			end
+
 		end
 		xml.target!
 
@@ -182,6 +202,17 @@ class ServerGroup
 				)
 				sg.servers << server
 			end
+			REXML::XPath.each(dom, "//client") do |client_xml|
+
+				client=Client.new(
+					:id => XMLUtil.element_text(client_xml, "id").to_i,
+					:name => XMLUtil.element_text(client_xml, "name"),
+					:description => XMLUtil.element_text(client_xml, "description"),
+					:status => XMLUtil.element_text(client_xml, "status")
+				)
+				sg.clients << client
+			end
+
 		end
 
 		sg

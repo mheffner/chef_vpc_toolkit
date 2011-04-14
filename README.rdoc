@@ -73,6 +73,11 @@ Example commands:
 
 		$ rake vpn:disconnect
 
+	- Connect to a Windows machine using rdesktop.
+
+		$ rake rdesktop SERVER_NAME=win1
+
+
 == Bash Automation Script
 The following is an example bash script to spin up a group and run commands via SSH. Useful for CI automation in Hudson, etc.
 
@@ -81,11 +86,16 @@ The following is an example bash script to spin up a group and run commands via 
 	chef-vpc-toolkit -v
 	trap "rake group:delete" INT TERM EXIT # cleanup the group on exit
 
+    # create a server group and Chef (includes Chef Server, cookbooks, clients)
 	rake create
-	VPN_GW=$(rake group:show | grep "VPN gateway IP" | sed -e "s|VPN gateway IP: ||")
-	ssh root@$VPN_GW bash <<-EOF_BASH
-		# do stuff here
-	EOF_BASH
+
+    # wait for Chef clients to finish running
+	rake chef:poll_clients
+
+    # Run some scripts on the login server
+    rake ssh bash <<-EOF_BASH
+        echo 'It works!'
+    EOF_BASH
 
 == Author
 
@@ -94,4 +104,4 @@ Dan Prince <dan.prince@rackspace.com>
 == License
 
 See COPYING for license information.
-Copyright (c) 2010, Rackspace US, Inc.
+Copyright (c) 2010-2011, Rackspace US, Inc.

@@ -217,6 +217,10 @@ module VpnNetworkManager
 		puts %x{#{sudo_display} nmcli con down id "VPC Group: #{server_group_id}"}
 	end
 
+	def self.connected?(server_group_id)
+		return system("#{sudo_display} nmcli con status | grep -c 'VPC Group: #{server_group_id}' &> /dev/null")
+	end
+
 	def self.ip_to_integer(ip_string)
 		return 0 if ip_string.nil?
 		ip_arr=ip_string.split(".").collect{ |s| s.to_i }

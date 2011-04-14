@@ -137,6 +137,12 @@ namespace :group do
 		puts "Server '#{server_name}' deleted."
 	end
 
+	desc "Print the VPN gateway IP address"
+	task :vpn_gateway_ip do
+		group=ServerGroup.fetch(:source => "cache")
+		puts group.vpn_gateway_ip
+	end
+
 end
 
 namespace :server do
@@ -404,19 +410,25 @@ task :rdesktop => 'group:init' do
     use_public_ip=ENV['PUBLIC_IP']
 
     sg=ServerGroup.fetch(:source => "cache")
+    pass=sg.server(server_name).admin_password
 
     if use_public_ip.nil? then
-        local_ip=%x{ssh -o \"StrictHostKeyChecking no\" root@#{sg.vpn_gateway_ip} grep #{server_name}.#{sg.domain_name} /etc/hosts | cut -f 1}.chomp
-        pass=sg.server(server_name).admin_password
-        %x{
-        ssh root@#{sg.vpn_gateway_ip} -L 1234:#{local_ip}:3389 'sleep 3 & exit' &
-        sleep 1
-        rdesktop localhost:1234 -u Administrator -p #{pass}
-        }
+		if ChefVPCToolkit::VpnNetworkManager.connected?(sg.id)
+            # on the VPN we connect directly to the windows machine
+            local_ip=%x{ssh -o \"StrictHostKeyChecking no\" root@#{sg.vpn_gateway_ip} grep #{server_name}.#{sg.domain_name} /etc/hosts | cut -f 1}.chomp
+            exec("rdesktop #{local_ip} -u Administrator -p #{pass}")
+        else
+            # when not on the VPN create an SSH tunnel for rdesktop traffic
+            local_ip=%x{ssh -o \"StrictHostKeyChecking no\" root@#{sg.vpn_gateway_ip} grep #{server_name}.#{sg.domain_name} /etc/hosts | cut -f 1}.chomp
+            %x{
+            ssh root@#{sg.vpn_gateway_ip} -L 1234:#{local_ip}:3389 'sleep 3 & exit' &
+            sleep 1
+            rdesktop localhost:1234 -u Administrator -p #{pass}
+            }
+        end
     else
-        pass=sg.server(server_name).admin_password
-        ip=sg.server(server_name).external_ip_addr
-        exec("rdesktop #{ip} -u Administrator -p #{pass}")
+        public_ip=sg.server(server_name).external_ip_addr
+        exec("rdesktop #{public_ip} -u Administrator -p #{pass}")
     end
 
 end
