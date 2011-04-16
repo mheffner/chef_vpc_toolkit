@@ -222,7 +222,7 @@ namespace :chef do
 		timeout=ENV['CHEF_TIMEOUT']
 		group=ServerGroup.fetch(:source => "cache")
 		if server_list.nil? or server_list.empty?
-		    server_list=group.server_names.collect{|x| x+" "}.to_s
+		    server_list=group.server_names.collect{|x| x+" "}.join.to_s
 		end
 		if timeout.nil? or timeout.empty?
             timeout=600
@@ -341,7 +341,7 @@ namespace :vpn do
 			vpn_client_name=configs['vpn_client_name']
 		end
 
-		client=Client.create(group, vpn_client_name)
+		client=Client.create(group, vpn_client_name, true)
 		puts "Client ID #{client.id} created."
 		
 	end

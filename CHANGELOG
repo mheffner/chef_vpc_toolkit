@@ -1,3 +1,6 @@
+* Thu Apr 16 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.1
+  - Updates to support Ruby 1.9.2.
+
 * Thu Apr 14 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.0
   - Make /root/cookbook-repos on the Chef server if it doesn't exist.
   - Add cache_file option to the VPC Client class.

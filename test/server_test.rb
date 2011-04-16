@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/test_helper'
+$:.unshift File.dirname(__FILE__)
+require 'test_helper'
 
 module ChefVPCToolkit
 module CloudServersVPC

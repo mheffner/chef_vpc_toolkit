@@ -25,10 +25,18 @@ class Client
 		@id=options[:id].to_i
 		@name=options[:name]
 		@description=options[:description]
+		if options[:status]
+			@status=options[:status]
+		else
+			@status = "Pending"
+		end
 		@status=options[:status] or @status = "Pending"
 		@server_group_id=options[:server_group_id]
-		@cache_file=options[:cache_file] or options[:server_group_id]
-
+		if options[:cache_file] then
+			@cache_file=options[:cache_file]
+		else
+			@cache_file=options[:server_group_id]
+		end
 		@vpn_network_interfaces=[]
 	end
 
@@ -52,17 +60,16 @@ class Client
 	end
 
 	def self.from_xml(xml)
-
 		client=nil
 		dom = REXML::Document.new(xml)
-		REXML::XPath.each(dom, "/client") do |client|
+		REXML::XPath.each(dom, "/client") do |cxml|
 
 			client=Client.new(
-				:id => XMLUtil.element_text(client,"id").to_i,
-				:name => XMLUtil.element_text(client, "name"),
-				:description => XMLUtil.element_text(client,"description"),
-				:status => XMLUtil.element_text(client,"status"),
-				:server_group_id => XMLUtil.element_text(client, "server-group-id").to_i
+				:id => XMLUtil.element_text(cxml,"id").to_i,
+				:name => XMLUtil.element_text(cxml, "name"),
+				:description => XMLUtil.element_text(cxml,"description"),
+				:status => XMLUtil.element_text(cxml,"status"),
+				:server_group_id => XMLUtil.element_text(cxml, "server-group-id").to_i
 			)
 			REXML::XPath.each(dom, "//vpn-network-interface") do |vni|
 				vni = VpnNetworkInterface.new(
@@ -75,10 +82,8 @@ class Client
 				)
 				client.vpn_network_interfaces << vni
 			end
-		end		 
-					
+		end
 		client
-					
 	end 
 
     def to_xml

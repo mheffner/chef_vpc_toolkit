@@ -19,6 +19,16 @@ def self.load_configs
 
 end
 
+def self.get_cookbook_repos(options)
+	cookbook_repos_config=options["chef_cookbook_repos"]
+	return "" if cookbook_repos_config.nil?
+	if cookbook_repos_config.respond_to?(:inject) then
+		return options["chef_cookbook_repos"].inject { |sum, c| sum + " " + c }
+	else
+		return cookbook_repos_config.to_s
+	end
+end
+
 # validate the chef.json config file by parsing it
 def self.validate_json(options)
 
@@ -65,10 +75,7 @@ json.each_pair do |node_name, node_json|
 	knife_add_nodes_script+="knife_add_node '#{node_name}' '#{run_list}' '#{attributes}'\n"
 end
 
-cookbook_urls=""
-if options["chef_cookbook_repos"] then
-	cookbook_urls=options["chef_cookbook_repos"].inject { |sum, c| sum + " " + c }
-end
+cookbook_urls=self.get_cookbook_repos(options)
 os_type=machine_os_types[options['chef_server_name']]
 
 data=%x{
@@ -254,10 +261,7 @@ def self.rsync_cookbook_repos(options, local_dir="#{CHEF_VPC_PROJECT}/cookbook-r
 		puts "OK"
 	end
 
-	cookbook_urls=""
-	if options["chef_cookbook_repos"] then
-		cookbook_urls=options["chef_cookbook_repos"].inject { |sum, c| sum + " " + c }
-	end
+	cookbook_urls=self.get_cookbook_repos(options)
 
 	data=%x{
 	ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_SSH"

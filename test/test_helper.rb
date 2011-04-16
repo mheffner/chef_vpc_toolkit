@@ -3,9 +3,8 @@ require 'rubygems'
 require 'mocha'
 CHEF_VPC_PROJECT = "#{File.dirname(__FILE__)}" unless defined?(CHEF_VPC_PROJECT)
 
-Dir[File.join(File.dirname(__FILE__), '/../lib', '*.rb')].each do  |lib|
-    require(lib)
-end
+$:.unshift File.dirname(__FILE__) + '/../lib'
+require 'chef-vpc-toolkit'
 
 require 'tempfile'
 require 'fileutils'
