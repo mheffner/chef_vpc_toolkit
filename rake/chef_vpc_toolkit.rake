@@ -230,7 +230,9 @@ namespace :chef do
 		configs=ChefInstaller.load_configs
 		configs["ssh_gateway_ip"]=group.vpn_gateway_ip
         puts "Polling for Chef clients to finish running..."
-        ChefInstaller.poll_clients(configs, server_list, timeout)
+        if not ChefInstaller.poll_clients(configs, server_list, timeout) then
+			raise "Chef client timeout."
+		end
 
 	end
 

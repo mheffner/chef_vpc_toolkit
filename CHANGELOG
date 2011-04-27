@@ -1,3 +1,7 @@
+* Thu Apr 24 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.2
+  - Raise an error in the chef:poll_clients task if a timeout occurs.
+  - Use CDN to install Chef for Ubuntu.
+
 * Thu Apr 16 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.1
   - Updates to support Ruby 1.9.2.
 
