@@ -32,7 +32,7 @@ module Util
 			raise_if_nil_or_empty(configs, "cloud_servers_vpc_password")
 			@@configs=configs
 		else
-			raise "Failed to load cloud toolkit config file. Please configure /etc/chef_vpc_toolkit.conf or create a .chef_vpc_toolkit.conf config file in your HOME directory."
+			raise "Failed to load chef VPC toolkit config file. Please configure /etc/chef_vpc_toolkit.conf or create a .chef_vpc_toolkit.conf config file in your HOME directory."
 		end
 
 		@@configs
