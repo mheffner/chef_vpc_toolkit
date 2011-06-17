@@ -183,7 +183,6 @@ namespace :chef do
 			ChefInstaller.create_databags(configs)
 			ChefInstaller.install_chef_clients(configs, client_validation_key, group.os_types)
 		else
-			raise "Server with name '#{server_name}' does not exist." if group.server(server_name).nil?
 			client_validation_key=ChefInstaller.client_validation_key(configs)
 			ChefInstaller.install_chef_client(configs, server_name, client_validation_key, group.os_types[server_name])
 		end

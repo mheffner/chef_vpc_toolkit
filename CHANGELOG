@@ -1,3 +1,6 @@
+* Thu Jun 17 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.3
+  - Update to support images that have Chef preinstalled.
+
 * Thu Apr 24 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.2
   - Raise an error in the chef:poll_clients task if a timeout occurs.
   - Use CDN to install Chef for Ubuntu.

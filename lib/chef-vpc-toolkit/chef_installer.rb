@@ -29,6 +29,16 @@ def self.get_cookbook_repos(options)
 	end
 end
 
+def self.install_chef_script(install_type="CLIENT", os_type="")
+	return "" if os_type.nil? or os_type.empty?
+
+	return %{
+	#{IO.read(File.dirname(__FILE__) + "/chef_bootstrap/#{os_type}.bash")}
+	install_chef "#{install_type}"
+	}
+
+end
+
 # validate the chef.json config file by parsing it
 def self.validate_json(options)
 
@@ -91,9 +101,8 @@ data=%x{
 ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 ssh #{options['chef_server_name']} bash <<-"EOF_BASH"
 #{IO.read(File.dirname(__FILE__) + "/cloud_files.bash")}
-#{IO.read(File.dirname(__FILE__) + "/chef_bootstrap/#{os_type}.bash")}
+#{install_chef_script('SERVER', os_type)}
 #{IO.read(CHEF_INSTALL_FUNCTIONS)}
-install_chef "SERVER"
 
 mkdir -p /root/cookbook-repos
 
@@ -157,9 +166,8 @@ def self.install_chef_client(options, client_name, client_validation_key, os_typ
 	ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
 	ssh #{client_name} bash <<-"EOF_BASH"
 	#{IO.read(File.dirname(__FILE__) + "/cloud_files.bash")}
-	#{IO.read(File.dirname(__FILE__) + "/chef_bootstrap/#{os_type}.bash")}
 	#{IO.read(CHEF_INSTALL_FUNCTIONS)}
-	install_chef "CLIENT"
+	#{install_chef_script('CLIENT', os_type)}
 	configure_chef_client '#{options['chef_server_name']}' '#{client_validation_key}'
 	start_chef_client
 	EOF_BASH
