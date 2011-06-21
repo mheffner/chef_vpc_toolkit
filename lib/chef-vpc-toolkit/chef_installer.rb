@@ -164,6 +164,10 @@ def self.install_chef_client(options, client_name, client_validation_key, os_typ
 
 	data=%x{
 	ssh -o "StrictHostKeyChecking no" root@#{options['ssh_gateway_ip']} bash <<-"EOF_GATEWAY"
+	if ! grep -c "#{client_name}" /etc/hosts &> /dev/null; then
+		echo "Client '#{client_name}' doesn't exist."
+		exit 0
+	fi
 	ssh #{client_name} bash <<-"EOF_BASH"
 	#{IO.read(File.dirname(__FILE__) + "/cloud_files.bash")}
 	#{IO.read(CHEF_INSTALL_FUNCTIONS)}
