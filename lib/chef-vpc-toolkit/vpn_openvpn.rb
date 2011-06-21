@@ -1,33 +1,13 @@
 
 module ChefVPCToolkit
-class VpnConnection
-
-       	CERT_DIR=File.join(ENV['HOME'], '.pki', 'openvpn')
+class VpnOpenVpn < VpnConnection
 
         def initialize(group, client = nil)
-                @group = group
-                @client = client
+                super(group, client)
         end
 
         def connect
-                # XXX: abstract
-
-                @ca_cert=get_cfile('ca.crt')
-                @client_cert=get_cfile('client.crt')
-		@client_key=get_cfile('client.key')
-
-		vpn_interface = @client.vpn_network_interfaces[0]
-
-		FileUtils.mkdir_p(File.join(CERT_DIR, @group.id.to_s))
-		File::chmod(0700, File.join(ENV['HOME'], '.pki'))
-		File::chmod(0700, CERT_DIR)
-
-		File.open(@ca_cert, 'w') { |f| f.write(vpn_interface.ca_cert) }
-		File.open(@client_cert, 'w') { |f| f.write(vpn_interface.client_cert) }
-		File.open(@client_key, 'w') do |f|
-			f.write(vpn_interface.client_key)
-			f.chmod(0600)
-		end
+                create_certs
 
                 @up_script=get_cfile('up.bash')
                 File.open(@up_script, 'w') do |f|
@@ -97,13 +77,13 @@ EOF_CONFIG
                 system("sudo kill -TERM #{pid}")
         end
 
+        def connected?
+                system("/sbin/route -n | grep #{@group.vpn_network.chomp("0")+"1"} &> /dev/null")
+        end
+
         def clean
-		FileUtils.rm_rf(File.join(CERT_DIR, @group.id.to_s))
+                delete_certs
 	end
 private
-
-        def get_cfile(file)
-                File.join(CERT_DIR, @group.id.to_s, file)
-        end
 end
 end

@@ -9,28 +9,34 @@ require 'tempfile'
 
 module ChefVPCToolkit
 
-module VpnNetworkManager
+class VpnNetworkManager < VpnConnection
 
-	CERT_DIR=File.join(ENV['HOME'], '.pki', 'openvpn')
+        def initialize(group, client = nil)
+                super(group, client)
+        end
 
-	def self.configure_gconf(group, client)
+	def connect
+                create_certs
+                configure_gconf
 
-		ca_cert=File.join(CERT_DIR, group.id.to_s, 'ca.crt')
-		client_cert=File.join(CERT_DIR, group.id.to_s, 'client.crt')
-		client_key=File.join(CERT_DIR, group.id.to_s, 'client.key')
+		puts %x{#{sudo_display} nmcli con up id "VPC Group: #{@group.id}"}
+	end
 
-		vpn_interface=client.vpn_network_interfaces[0]
+	def disconnect
+		puts %x{#{sudo_display} nmcli con down id "VPC Group: #{@group.id}"}
+	end
 
-		FileUtils.mkdir_p(File.join(CERT_DIR, group.id.to_s))
-		File::chmod(0700, File.join(ENV['HOME'], '.pki'))
-		File::chmod(0700, CERT_DIR)
+	def connected?
+		return system("#{sudo_display} nmcli con status | grep -c 'VPC Group: #{@group.id}' &> /dev/null")
+	end
 
-		File.open(ca_cert, 'w') { |f| f.write(vpn_interface.ca_cert) }
-		File.open(client_cert, 'w') { |f| f.write(vpn_interface.client_cert) }
-		File.open(client_key, 'w') do |f|
-			f.write(vpn_interface.client_key)
-			f.chmod(0600)
-		end
+        def clean
+                unset_gconf_config
+                delete_certs
+        end
+private
+
+	def configure_gconf
 
 		xml = Builder::XmlMarkup.new
 		xml.gconfentryfile do |file|
@@ -45,7 +51,7 @@ module VpnNetworkManager
 				entrylist.entry do |entry|
 					entry.key("connection/id")
 					entry.value do |value|
-						value.string("VPC Group: #{group.id}")
+						value.string("VPC Group: #{@group.id}")
 					end
 				end
 				entrylist.entry do |entry|
@@ -83,7 +89,7 @@ module VpnNetworkManager
 					entry.key("ipv4/dns")
 					entry.value do |value|
 						value.list("type" => "int") do |list|
-							ip=IPAddr.new(group.vpn_network.chomp("0")+"1")
+							ip=IPAddr.new(@group.vpn_network.chomp("0")+"1")
 							list.value do |lv|
 								lv.int(ip_to_integer(ip.to_s))
 							end
@@ -95,7 +101,7 @@ module VpnNetworkManager
 					entry.value do |value|
 						value.list("type" => "string") do |list|
 							list.value do |lv|
-								lv.string(group.domain_name)
+								lv.string(@group.domain_name)
 							end
 						end
 					end
@@ -134,13 +140,13 @@ module VpnNetworkManager
 				entrylist.entry do |entry|
 					entry.key("vpn/ca")
 					entry.value do |value|
-						value.string(ca_cert)
+						value.string(@ca_cert)
 					end
 				end
 				entrylist.entry do |entry|
 					entry.key("vpn/cert")
 					entry.value do |value|
-						value.string(client_cert)
+						value.string(@client_cert)
 					end
 				end
 				entrylist.entry do |entry|
@@ -158,7 +164,7 @@ module VpnNetworkManager
 				entrylist.entry do |entry|
 					entry.key("vpn/key")
 					entry.value do |value|
-						value.string(client_key)
+						value.string(@client_key)
 					end
 				end
 				entrylist.entry do |entry|
@@ -178,7 +184,7 @@ module VpnNetworkManager
 				entrylist.entry do |entry|
 					entry.key("vpn/remote")
 					entry.value do |value|
-						value.string(group.vpn_gateway_ip)
+						value.string(@group.vpn_gateway_ip)
 					end
 				end
 				entrylist.entry do |entry|
@@ -201,39 +207,22 @@ module VpnNetworkManager
 
 	end
 
-	def self.unset_gconf_config(server_group_id)
-		puts %x{gconftool-2 --recursive-unset /system/networking/connections/vpc_#{server_group_id}}
+	def unset_gconf_config
+		puts %x{gconftool-2 --recursive-unset /system/networking/connections/vpc_#{@group.id}}
 	end
 
-	def self.delete_certs(server_group_id)
-		FileUtils.rm_rf(File.join(CERT_DIR, server_group_id.to_s))
-	end
-
-	def self.connect(server_group_id)
-		puts %x{#{sudo_display} nmcli con up id "VPC Group: #{server_group_id}"}
-	end
-
-	def self.disconnect(server_group_id)
-		puts %x{#{sudo_display} nmcli con down id "VPC Group: #{server_group_id}"}
-	end
-
-	def self.connected?(server_group_id)
-		return system("#{sudo_display} nmcli con status | grep -c 'VPC Group: #{server_group_id}' &> /dev/null")
-	end
-
-	def self.ip_to_integer(ip_string)
+	def ip_to_integer(ip_string)
 		return 0 if ip_string.nil?
 		ip_arr=ip_string.split(".").collect{ |s| s.to_i }
 		return ip_arr[0] + ip_arr[1]*2**8 + ip_arr[2]*2**16 + ip_arr[3]*2**24
 	end
 
-	def self.sudo_display
+	def sudo_display
 		if ENV['DISPLAY'].nil? or ENV['DISPLAY'] != ":0.0" then
 			"sudo"
 		else
 			""
 		end
 	end
-
 end
 end

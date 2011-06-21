@@ -297,10 +297,8 @@ namespace :vpn do
 			Rake::Task['vpn:poll_client'].invoke
 		end
 		client=Client.fetch(:id => group.id, :source => "cache")
-                vpn = ChefVPCToolkit::VpnConnection.new(group, client)
+                vpn = ChefVPCToolkit::get_vpn_connection(group, client)
                 vpn.connect
-		#ChefVPCToolkit::VpnNetworkManager.configure_gconf(group_hash, client)
-		#ChefVPCToolkit::VpnNetworkManager.connect(group_hash['id'])
 
 	end
 
@@ -308,9 +306,8 @@ namespace :vpn do
 	task :disconnect do
 
 		group=ServerGroup.fetch(:source => "cache")
-                vpn = ChefVPCToolkit::VpnConnection.new(group)
+                vpn = ChefVPCToolkit::get_vpn_connection(group)
                 vpn.disconnect
-		#ChefVPCToolkit::VpnNetworkManager.disconnect(group.id)
 
 		vpn_server_ip=group.vpn_network.chomp("0")+"1"
 		SshUtil.remove_known_hosts_ip(vpn_server_ip)
@@ -322,10 +319,8 @@ namespace :vpn do
 	task :delete do
 
 		group=ServerGroup.fetch(:source => "cache")
-                vpn = ChefVPCToolkit::VpnConnection.new(group)
+                vpn = ChefVPCToolkit::get_vpn_connection(group)
                 vpn.clean
-		#ChefVPCToolkit::VpnNetworkManager.unset_gconf_config(group.id)
-		#ChefVPCToolkit::VpnNetworkManager.delete_certs(group.id)
 
 		vpn_server_ip=group.vpn_network.chomp("0")+"1"
 		SshUtil.remove_known_hosts_ip(vpn_server_ip)
@@ -420,7 +415,8 @@ task :rdesktop => 'group:init' do
     pass=sg.server(server_name).admin_password
 
     if use_public_ip.nil? then
-		if ChefVPCToolkit::VpnNetworkManager.connected?(sg.id)
+            vpn = ChefVPCToolkit::get_vpn_connection(sg)
+            if vpn.connected?
             # on the VPN we connect directly to the windows machine
             local_ip=%x{ssh -o \"StrictHostKeyChecking no\" root@#{sg.vpn_gateway_ip} grep #{server_name}.#{sg.domain_name} /etc/hosts | cut -f 1}.chomp
             exec("rdesktop #{local_ip} -u Administrator -p #{pass}")
