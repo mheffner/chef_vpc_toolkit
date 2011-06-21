@@ -40,7 +40,7 @@ private
 
 		xml = Builder::XmlMarkup.new
 		xml.gconfentryfile do |file|
-			file.entrylist({ "base" => "/system/networking/connections/vpc_#{group.id}"}) do |entrylist|
+			file.entrylist({ "base" => "/system/networking/connections/vpc_#{@group.id}"}) do |entrylist|
 
 				entrylist.entry do |entry|
 					entry.key("connection/autoconnect")
@@ -173,7 +173,7 @@ private
 						value.string("yes")
 					end
 				end
-				if group.vpn_device == "tap"
+				if @group.vpn_device == "tap"
 					entrylist.entry do |entry|
 						entry.key("vpn/tap-dev")
 						entry.value do |value|

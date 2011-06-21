@@ -38,7 +38,7 @@ EOF_DOWN
                 File.open(@config_file, 'w') do |f|
                         f << <<EOF_CONFIG
 client
-dev tun
+dev #{@group.vpn_device}
 proto tcp
 
 #Change my.publicdomain.com to your public domain or IP address
@@ -68,13 +68,21 @@ EOF_CONFIG
                         f.chmod(0600)
                 end
 
-                system("sudo openvpn --config #{@config_file} --writepid #{get_cfile('openvpn.pid')} --daemon")
+                disconnect if File.exist?(get_cfile('openvpn.pid'))
+                out=%x{sudo openvpn --config #{@config_file} --writepid #{get_cfile('openvpn.pid')} --daemon}
+				retval=$?
+				if retval.success? then
+					puts "Openvpn started."
+				else
+					raise "Failed to create VPN connection: #{out}"
+				end
         end
 
         def disconnect
                 raise "Not running? No pid file found!" unless File.exist?(get_cfile('openvpn.pid'))
                 pid = File.read(get_cfile('openvpn.pid')).chomp
                 system("sudo kill -TERM #{pid}")
+                File.delete(get_cfile('openvpn.pid'))
         end
 
         def connected?
