@@ -22,15 +22,15 @@ The Chef VPC Toolkit is a set of Rake tasks that provide a framework to help aut
 
 == Installation
 
-Requires Ruby and Rubygems. The app was developed with Ruby 1.8.7.
+Requires Ruby and Rubygems. The app was developed with Ruby 1.8.7 and 1.9.2.
 
-The following gems are required:
+The following gems are required when developing/building the toolkit gem:
 
 	rake
 	builder (2.1.2)
 	json (> 1.4.3)
-        uuidtools
-        jeweler
+	uuidtools
+	jeweler
 
 To install the gem:
 
