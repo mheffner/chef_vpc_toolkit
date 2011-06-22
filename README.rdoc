@@ -29,6 +29,8 @@ The following gems are required:
 	rake
 	builder (2.1.2)
 	json (> 1.4.3)
+        uuidtools
+        jeweler
 
 To install the gem:
 
