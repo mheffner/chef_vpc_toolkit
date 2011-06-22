@@ -39,7 +39,7 @@ EOF_DOWN
 			f << <<EOF_CONFIG
 client
 dev #{@group.vpn_device}
-proto tcp
+proto #{@group.vpn_proto}
 
 #Change my.publicdomain.com to your public domain or IP address
 remote #{@group.vpn_gateway_ip} 1194

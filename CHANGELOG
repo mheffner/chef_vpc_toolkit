@@ -3,6 +3,8 @@
   - Skip missing nodes when trying to install Chef.
   - Added vpn_connection_type option w/ support for using command line
     openvpn or network_manager.
+  - Add support for 'udp' VPN protocol. Default protocol is 'tcp'.
+    UDP support requires Cloud Servers VPC 2.2.0 or greater.
 
 * Thu Apr 24 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.2
   - Raise an error in the chef:poll_clients task if a timeout occurs.

@@ -315,7 +315,7 @@ namespace :vpn do
 
 	end
 
-	desc "Delete VPN config information."
+	#desc "Delete VPN config information."
 	task :delete do
 
 		group=ServerGroup.fetch(:source => "cache")
@@ -333,7 +333,7 @@ namespace :vpn do
 
 	end
 
-	desc "Create a new VPN client."
+	#desc "Create a new VPN client."
 	task :create_client do
 
 		group=ServerGroup.fetch(:source => "cache")
@@ -348,7 +348,7 @@ namespace :vpn do
 		
 	end
 
-	desc "Poll until a client is online"
+	#desc "Poll until a client is online"
 	task :poll_client do
 
 		group=ServerGroup.fetch(:source => "cache")

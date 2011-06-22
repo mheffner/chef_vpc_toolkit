@@ -165,10 +165,19 @@ class VpnNetworkManager < VpnConnection
 						value.string(@client_key)
 					end
 				end
-				entrylist.entry do |entry|
-					entry.key("vpn/proto-tcp")
-					entry.value do |value|
-						value.string("yes")
+				if @group.vpn_proto == "tcp"
+					entrylist.entry do |entry|
+						entry.key("vpn/proto-tcp")
+						entry.value do |value|
+							value.string("yes")
+						end
+					end
+				else
+					entrylist.entry do |entry|
+						entry.key("vpn/proto-udp")
+						entry.value do |value|
+							value.string("yes")
+						end
 					end
 				end
 				if @group.vpn_device == "tap"

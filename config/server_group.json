@@ -2,6 +2,7 @@
 	"name": "test",
 	"domain_name": "vpc",
 	"description": "test description",
+    "vpn_device": "tun",
 	"servers": {
 		"login": {
 			"image_id": "69",
