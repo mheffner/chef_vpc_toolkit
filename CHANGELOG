@@ -1,6 +1,8 @@
-* Thu Jun 17 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.3
+* Thu Jun 21 2011 Dan Prince <dan.prince@rackspace.com> - 2.6.0
   - Update to support images that have Chef preinstalled.
   - Skip missing nodes when trying to install Chef.
+  - Added vpn_connection_type option w/ support for using command line
+    openvpn or network_manager.
 
 * Thu Apr 24 2011 Dan Prince <dan.prince@rackspace.com> - 2.5.2
   - Raise an error in the chef:poll_clients task if a timeout occurs.

@@ -15,15 +15,16 @@ require 'chef-vpc-toolkit/cloud-servers-vpc/vpn_network_interface'
 
 module ChefVPCToolkit
 
-        # Loads the appropriate VPN connection type based on
-        # the configuration variable 'vpn_connection_type'.
-        #
-        def self.get_vpn_connection(group, client = nil)
-                configs = Util.load_configs
-                if "#{configs['vpn_connection_type']}" == "openvpn"
-                        VpnOpenVpn.new(group, client)
-                else
-                        VpnNetworkManager.new(group, client)
-                end
-        end
+	# Loads the appropriate VPN connection type based on
+	# the configuration variable 'vpn_connection_type'.
+	#
+	def self.get_vpn_connection(group, client = nil)
+		configs = Util.load_configs
+		if "#{configs['vpn_connection_type']}" == "network_manager"
+			VpnNetworkManager.new(group, client)
+		else
+			VpnOpenVpn.new(group, client)
+		end
+	end
+
 end
