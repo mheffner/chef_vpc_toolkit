@@ -11,14 +11,13 @@ module ChefVPCToolkit
 
 class VpnNetworkManager < VpnConnection
 
-        def initialize(group, client = nil)
-                super(group, client)
-        end
+	def initialize(group, client = nil)
+		super(group, client)
+	end
 
 	def connect
-                create_certs
-                configure_gconf
-
+		create_certs
+		configure_gconf
 		puts %x{#{sudo_display} nmcli con up id "VPC Group: #{@group.id}"}
 	end
 
@@ -30,11 +29,10 @@ class VpnNetworkManager < VpnConnection
 		return system("#{sudo_display} nmcli con status | grep -c 'VPC Group: #{@group.id}' &> /dev/null")
 	end
 
-        def clean
-                unset_gconf_config
-                delete_certs
-        end
-private
+	def clean
+		unset_gconf_config
+		delete_certs
+	end
 
 	def configure_gconf
 
