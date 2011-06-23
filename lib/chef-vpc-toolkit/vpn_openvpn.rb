@@ -98,7 +98,7 @@ EOF_CONFIG
 	def poll_vpn_interface
 		interface_name=@group.vpn_device+"0"
 		1.upto(30) do |i|
-			break if system("ifconfig #{interface_name} &> /dev/null")
+			break if system("/sbin/ifconfig #{interface_name} > /dev/null 2>&1")
 			if i == 30 then
 				disconnect
 				raise "Failed to connect to VPN."

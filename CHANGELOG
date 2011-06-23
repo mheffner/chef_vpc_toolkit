@@ -1,3 +1,6 @@
+* Thu Jun 23 2011 Dan Prince <dan.prince@rackspace.com> - 2.6.1
+  - Use /sbin/ifconfig instead of ifconfig when testing for tap/tun.
+
 * Tue Jun 21 2011 Dan Prince <dan.prince@rackspace.com> - 2.6.0
   - Update to support images that have Chef preinstalled.
   - Skip missing nodes when trying to install Chef.
