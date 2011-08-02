@@ -395,6 +395,8 @@ class ServerGroup
 					"centos"
 				when 187811 # Centos 5.4
 					"centos"
+				when 78 # Fedora 15
+					"fedora"
 				when 71 # Fedora 14
 					"fedora"
 				when 53 # Fedora 13
