@@ -405,6 +405,10 @@ class ServerGroup
 					"rhel"
 				when 62 # RHEL 5.5
 					"rhel"
+				when 75 # Debian 6.0
+					"ubuntu"
+				when 76 # Ubuntu 11.04
+					"ubuntu"
 				when 69 # Ubuntu 10.10
 					"ubuntu"
 				when 49 # Ubuntu 10.04
